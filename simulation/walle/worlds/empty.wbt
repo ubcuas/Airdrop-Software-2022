@@ -1,0 +1,211 @@
+#VRML_SIM R2020b utf8
+WorldInfo {
+  defaultDamping Damping {
+  }
+  coordinateSystem "NUE"
+}
+Viewpoint {
+  orientation -0.0936924019660929 -0.9109956579328709 -0.40163247508297883 2.737930444020611
+  position -0.5611939292951135 1.6204943804762695 -1.2745153340632251
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+RectangleArena {
+}
+Robot {
+  translation 0 0.05125 0
+  children [
+    Transform {
+      translation 0 -0.02 0
+      rotation 1 0 0 1.5707996938995747
+      children [
+        DEF WATER_BOTTLE Solid {
+          children [
+            DEF WATER_BOTTLE Shape {
+              appearance PBRAppearance {
+              }
+              geometry Capsule {
+                height 0.08
+                radius 0.025
+              }
+            }
+          ]
+          name "water bottle"
+          boundingObject USE WATER_BOTTLE
+          physics Physics {
+            density 11
+            damping Damping {
+            }
+          }
+        }
+      ]
+    }
+    DEF POINTER Solid {
+      translation 0 0.00999986 0.04
+      rotation 1 0 0 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 1 0 0
+          }
+          geometry Cone {
+            bottomRadius 0.005
+            height 0.03
+          }
+        }
+      ]
+    }
+    DEF GPS GPS {
+      translation 0 0.08 0
+      children [
+        DEF GPS_STICK Solid {
+          translation 0 -0.04 0
+          children [
+            Shape {
+              appearance PBRAppearance {
+              }
+              geometry Cylinder {
+                height 0.075
+                radius 0.001
+              }
+            }
+          ]
+        }
+        DEF GPS Shape {
+          appearance PBRAppearance {
+          }
+          geometry Cylinder {
+            height 0.005
+            radius 0.01
+          }
+        }
+      ]
+    }
+    Compass {
+      translation -0.03 0.016 0
+      children [
+        DEF ACCEL Accelerometer {
+        }
+        DEF IMU InertialUnit {
+        }
+        DEF COMPASS Shape {
+          appearance PBRAppearance {
+            baseColor 0 1 0
+          }
+          geometry Box {
+            size 0.02 0.004 0.02
+          }
+        }
+      ]
+    }
+    DEF WHEEL_LEFT HingeJoint {
+      jointParameters HingeJointParameters {
+        position 4
+      }
+      device [
+        PositionSensor {
+        }
+        RotationalMotor {
+          name "left motor"
+        }
+      ]
+      endPoint DEF WHEEL_LEFT Solid {
+        translation -0.05011648256979789 -0.0005840870729974903 -5.912045971525693e-07
+        rotation 0.6650522715320435 -0.6594436989632944 -0.35048464164307835 3.8077189241386638
+        children [
+          Solid {
+            translation -0.0173205 0.01 0.00999998
+            rotation 0 1 0 -1.047195307179586
+            children [
+              Shape {
+                appearance PBRAppearance {
+                }
+                geometry Box {
+                  size 0.01 0.005 0.05
+                }
+              }
+            ]
+          }
+          DEF WHEEL_LEFT Shape {
+            appearance PBRAppearance {
+              baseColor 1 1 0
+            }
+            geometry Cylinder {
+              height 0.01
+              radius 0.05
+            }
+          }
+        ]
+        name "wheel left"
+        boundingObject USE WHEEL_LEFT
+        physics Physics {
+          density 1530
+          damping Damping {
+          }
+        }
+      }
+    }
+    DEF WHEEL_RIGHT HingeJoint {
+      jointParameters HingeJointParameters {
+        position 5
+      }
+      device [
+        RotationalMotor {
+          name "right motor"
+        }
+        PositionSensor {
+        }
+      ]
+      endPoint DEF WHEEL_RIGHT Solid {
+        translation 0.05012289346491765 8.957416428210863e-05 6.505590170452643e-05
+        rotation 0.48500105740617855 0.48740445034205065 0.726092883935418 4.401057302325373
+        children [
+          Solid {
+            translation 0 0.01 0.02
+            children [
+              Shape {
+                appearance PBRAppearance {
+                }
+                geometry Box {
+                  size 0.01 0.005 0.05
+                }
+              }
+            ]
+          }
+          DEF WHEEL_RIGHT Shape {
+            appearance PBRAppearance {
+              baseColor 1 1 0
+            }
+            geometry Cylinder {
+              height 0.01
+              radius 0.05
+            }
+          }
+        ]
+        name "wheel right"
+        boundingObject USE WHEEL_RIGHT
+        physics Physics {
+          density 1530
+          damping Damping {
+          }
+        }
+      }
+    }
+    DEF BODY Shape {
+      appearance PBRAppearance {
+        baseColor 0 1 1
+      }
+      geometry Box {
+        size 0.1 0.025 0.05
+      }
+    }
+  ]
+  name "wallE"
+  boundingObject USE BODY
+  physics Physics {
+    density 2000
+  }
+  controller "main_controller"
+}
