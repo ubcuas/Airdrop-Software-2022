@@ -40,7 +40,7 @@ Driver::Driver() {
   rightMotor = getMotor("right motor");
   leftMotor->setPosition(INFINITY);
   rightMotor->setPosition(INFINITY);
-  leftMotor->setVelocity(0.0);`
+  leftMotor->setVelocity(0.0);
   rightMotor->setVelocity(0.0);
   
   keyboard = getKeyboard();

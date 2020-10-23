@@ -57,7 +57,7 @@ Robot {
         }
       ]
     }
-    DEF GPS GPS {
+    DEF M8N GPS {
       translation 0 0.08 0
       children [
         DEF GPS_STICK Solid {
@@ -83,7 +83,7 @@ Robot {
         }
       ]
     }
-    Compass {
+    DEF BNO055 Compass {
       translation -0.03 0.016 0
       children [
         DEF ACCEL Accelerometer {
@@ -99,6 +99,10 @@ Robot {
           }
         }
       ]
+      model "BNO055"
+      boundingObject USE COMPASS
+      physics Physics {
+      }
     }
     DEF WHEEL_LEFT HingeJoint {
       jointParameters HingeJointParameters {
@@ -112,7 +116,7 @@ Robot {
         }
       ]
       endPoint DEF WHEEL_LEFT Solid {
-        translation -0.05011648256979789 -0.0005840870729974903 -5.912045971525693e-07
+        translation -0.05011648256979798 -0.0005840870729974903 -5.912045971525693e-07
         rotation 0.6650522715320435 -0.6594436989632944 -0.35048464164307835 3.8077189241386638
         children [
           Solid {
@@ -159,8 +163,8 @@ Robot {
         }
       ]
       endPoint DEF WHEEL_RIGHT Solid {
-        translation 0.05012289346491765 8.957416428210863e-05 6.505590170452643e-05
-        rotation 0.48500105740617855 0.48740445034205065 0.726092883935418 4.401057302325373
+        translation 0.05012289346491765 8.957416428210868e-05 6.505590170452643e-05
+        rotation 0.48500105740617866 0.4874044503420505 0.7260928839354178 4.401057302325373
         children [
           Solid {
             translation 0 0.01 0.02

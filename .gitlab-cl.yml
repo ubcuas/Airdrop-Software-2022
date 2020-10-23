@@ -1,0 +1,11 @@
+image: python:3.7
+
+stages:
+ - test
+
+before_script:
+  - "pip install -U platformio && cd ./rover/Wall-E"
+
+job:
+  stage: test
+  script: "platformio run -d ."
