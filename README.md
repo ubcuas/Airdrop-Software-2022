@@ -1,6 +1,6 @@
 # Airdrop Software
 
-![License: GPL v3](docs/README.assets/License-GPLv3-blue.svg)![](README.assets/pipeline.svg)
+![License: GPL v3](docs/README.assets/License-GPLv3-blue.svg)![](https://gitlab.com/ubcuasinfo/airdrop-software-2020/badges/master/pipeline.svg)
 
 ![Wall-E / 1920x1080 Wallpaper | Wall e, Animated movies, Animation movie](docs/README.assets/051db99b019d8ab861c87ac76c04ed81.jpg)
 
