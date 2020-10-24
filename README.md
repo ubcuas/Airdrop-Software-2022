@@ -1,4 +1,4 @@
-# Airdrop Software
+# WOOWOAWOADOAWOD
 
 ![License: GPL v3](docs/README.assets/License-GPLv3-blue.svg)![](https://gitlab.com/ubcuasinfo/airdrop-software-2020/badges/master/pipeline.svg)
 
