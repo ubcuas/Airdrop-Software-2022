@@ -86,9 +86,9 @@ As you are working on your code on your branch and making commits, you'll want t
 
 To do this, you have 2 options: rebase or merge. [What's the difference?](https://www.atlassian.com/git/tutorials/merging-vs-rebasing). 
 
-Merging is generally recommended, because it is easier to handle conflicts and get stuff working. To merge, simply run `git pull upstream master`.
+Merging is generally recommended, because it is easier to handle conflicts and get stuff working. To merge, simply run `git pull origin master`.
 
-Rebasing requires more knowledge of git and can cause crazy merge conflicts, so it isn't recommended. You can simply `git pull --rebase upstream master` to rebase your branch onto the latest `upstream/master`.
+Rebasing requires more knowledge of git and can cause crazy merge conflicts, so it isn't recommended. You can simply `git pull --rebase origin master` to rebase your branch onto the latest `origin/master`.
 
 If you do rebase or merge and get conflicts, you'll need to resolve them manually. [See here for a quick tutorials on what conflicts are and how to resolve them](https://www.atlassian.com/git/tutorials/using-branches/merge-conflicts). Feel free to do this in your IDE or with whatever tool you are most comfortable with. Updating your branch often helps keep conflicts to a minimum, and when they do appear they are usually smaller. Ask for help if you're really stuck!
 
