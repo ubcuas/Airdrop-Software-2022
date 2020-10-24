@@ -53,6 +53,8 @@ You are read more about it here:
   - [atlassian](https://www.atlassian.com/git/tutorials/comparing-workflows#centralized-workflow) **(recommended)**. Complete *Getting Started* and *Collaborating* sections.
   - [gitlab](https://docs.gitlab.com/ee/gitlab-basics/)
 
+> Example: See issue #4, merge request !3 and branch `origin/4-workflow-example`
+
 ###  2.1. <a name='Masterbranch'></a>Master branch
 
 This is the "production" branch of our project, and any changes made to it will be thoroughly reviewed and tested. The master branch, or `origin/master` will be tagged with versions that indicates the change/features of the new version, and the `latest` is the version that we will deploy on our integration testing system. There are some key difference between a master branch and a normal branch (development):
