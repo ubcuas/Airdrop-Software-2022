@@ -62,12 +62,16 @@ Software Checklist
 
 - [vscode](https://code.visualstudio.com/download)
 - [webots](https://www.cyberbotics.com/)
+
+VSCode plugins
 - [platformio](https://platformio.org/platformio-ide)
   - might require `python3` installed
+- [live share](https://visualstudio.microsoft.com/services/live-share/)
+  - require gitlab/microsoft login
+- [clang-format](https://marketplace.visualstudio.com/items?itemName=xaver.clang-format)
 
 Others
-
-- usb driver is  (on linux, please check `lsusb`)
+- usb driver is updated (on linux, please check `lsusb`)
 
 ###  3.1. <a name='Build'></a>Build
 
@@ -76,7 +80,6 @@ TBC
 ###  3.2. <a name='Run'></a>Run
 
 TBC
-
 
 
 ###  3.3. <a name='Test'></a>Test
