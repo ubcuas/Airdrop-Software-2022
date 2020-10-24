@@ -89,7 +89,7 @@ TBC
 
 Our software in the loop testing will use Webots as the simulation environment. Webots will replace the physical robot, simulate it's behaviour, and provides simulated sensor data based on the state of the robot. 
 
-Please refer to [Simulation](simulation/README.md)
+Please refer to [Simulation](simulation/walle/README.md)
 
 
 
