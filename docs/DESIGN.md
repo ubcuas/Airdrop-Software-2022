@@ -44,13 +44,13 @@ class RCReceiver{
  <<interface>>
 -int throttle_channel
 -int yaw_channel
-- int calibrated_throttle_max
-- int calibrated_throttle_min
-- int calibrated_yaw_max
-- int calibrated_yaw_min
-- int mode_thresh_terminate
-- int mode_thresh_auto
-- int mode_thresh_manual
+-int calibrated_throttle_max
+-int calibrated_throttle_min
+-int calibrated_yaw_max
+-int calibrated_yaw_min
+-int mode_thresh_terminate
+-int mode_thresh_auto
+-int mode_thresh_manual
 +ReadThrottle(): int
 +ReadYaw(): int
 +ReadModeSwitch(): RCSwtichMode
@@ -76,33 +76,33 @@ class BNO055 {
 
 Sensor <|-- GPS
 class GPS {
-  - TinyGPSPlus gps
-  - GPSCoordinate current_gps
-  + WaitForGPSConnection(): void
-  + GetCurrentGPSCoordinate(): GPSCoordinate
+  -TinyGPSPlus gps
+  -GPSCoordinate current_gps
+  +WaitForGPSConnection(): void
+  +GetCurrentGPSCoordinate(): GPSCoordinate
 }
 
 GPS o-- GPSCoordinate
 class GPSCoordinate {
-  - double latitude
-  - double longtitude
-  + GPS(double lat, double longi)
-  + GetDistanceTo(GPS dest): double
-  + GetHeadingTo(GPS dest): double
-  + GetDistanceBetween(GPS source, GPS dest): double
-  + GetHeadingBetween(GPS source, GPS dest): double
+  -double latitude
+  -double longtitude
+  +GPS(double lat, double longi)
+  +GetDistanceTo(GPS dest): double
+  +GetHeadingTo(GPS dest): double
+  +GetDistanceBetween(GPS source, GPS dest): double
+  +GetHeadingBetween(GPS source, GPS dest): double
 }
 
 
 Sensor <|-- Altimeter
 class Altimeter {
-  - double current_altitude
-  + GetCurrentAltitude(): double
+  -double current_altitude
+  +GetCurrentAltitude(): double
 }
 
 Sensor <|-- Encoder
 class Encoder {
-  - long current_tick
+  -long current_tick
 }
 
 
@@ -125,14 +125,14 @@ class Acuator {
 
 Acuator <|-- Motor
 class Motor {
-  - bool direction
-  - double current_speed
+  -bool direction
+  -double current_speed
   -ReverseMotor(): void
 }
 
 Acuator <|-- Servo
 class Servo {
-  - int current_angle
+  -int current_angle
   +GetCurrentAngle(): int
 }
 ```
@@ -143,9 +143,9 @@ classDiagram
 
 class Mode {
     <<interface>>
-    + Init(): void
-    + Run(): void
-    + Stop(): void
+    +Init(): void
+    +Run(): void
+    +Stop(): void
 }
 
 Mode <|-- ManualControlMode
@@ -155,15 +155,15 @@ Mode <|-- LowPowerMode
 
 StateMachine *-- State
 class StateMachine {
-    + StateMachine()
-    + Init(): void
-    + Run(): void
+    +StateMachine()
+    +Init(): void
+    +Run(): void
 }
 class Controller {
-  + Controller()
-  + MotorController(int throttle, int turn_angle): std::pair
-  + HeadingPIDController(int heading): int
-  + RCController(int throttle_value, int yaw_value): std::pair
+  +Controller()
+  +MotorController(int throttle, int turn_angle): std::pair
+  +ReadingPIDController(int heading): int
+  +RCController(int throttle_value, int yaw_value): std::pair
 }
 
 class State {
