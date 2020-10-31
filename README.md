@@ -37,16 +37,16 @@ Welcome to UAV Airdrop software! We are the subteam in [UBC UAS](www.ubcuas.com)
 ```mermaid
 gantt
     title Timeline
-    dateFormat  YYYY-MM-DD
+    dateFormat  YY-MM-DD
 
     section Design
-    Proposal            :done,    des1, 2019-09-26,2019-10-03
-    Design review 1            :done,  des2, 2019-10-03, 2019-10-17
+    Proposal            :done,    des1, 20-09-26,20-10-03
+    Design review 1            :done,  des2, 20-10-03, 20-10-17
     System design               :active,         des3, after des2, 3w
     Design review 2              :         des4, after des3, 1w
 
     section Implementation
-    Divide tasks into modules :crit, done, imp1, 2019-10-17,7d
+    Divide tasks into modules :crit, done, imp1, 20-10-17,7d
     Deliver modules          :crit, done, after imp1, 7d
     Working on modules             :crit, active, imp2, after imp1, 3w
    	Submodule testing        :crit, after imp2, 2w
