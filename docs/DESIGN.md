@@ -38,28 +38,34 @@ class Sensor {
  +Stop(): bool
 }
 
-
-RCReceiver *-- PWMReceiver
-class RCReceiver {
-  - PWMReceiver throttle
-  - PWMReceiver yaw
-  +ReadThrottle(): int
-  +ReadYaw(): int
+Sensor <|-- RCReceiver
+RCReceiver *-- RCSwtichMode
+class RCReceiver{
+ <<interface>>
+-int throttle_channel
+-int yaw_channel
+- int calibrated_throttle_max
+- int calibrated_throttle_min
+- int calibrated_yaw_max
+- int calibrated_yaw_min
+- int mode_thresh_terminate
+- int mode_thresh_auto
+- int mode_thresh_manual
++ReadThrottle(): int
++ReadYaw(): int
++ReadModeSwitch(): RCSwtichMode
 }
 
-Sensor <|-- PWMReceiver
-class PWMReceiver {
-  -int pwm_value
-  +ReadRCValue(): int
+class RCSwtichMode{
+  <<enumeration>>
+  TERMINATE
+  AUTO
+  MANUAL
 }
 
-Sensor <|-- PPMReceiver
-class PPMReceiver {
-  -int throttle_channel
-  -int yaw_channel
-  +ReadThrottle(): int
-  +ReadYaw(): int
-}
+RCReceiver <|-- PWMReceiver
+
+RCReceiver <|-- PPMReceiver
 
 Sensor <|-- BNO055
 class BNO055 {
@@ -130,38 +136,34 @@ class Servo {
   +GetCurrentAngle(): int
 }
 ```
+#### Controller class
 
-
-<!-- ```mermaid
+```mermaid
 classDiagram
-class BankAccount{
-    +String owner
-    +BigDecimal balance
-    +deposit(amount) bool
-    +withdrawl(amount)
-}
-class ManualControlMode {
 
+class Mode {
+    <<interface>>
+    + Init(): void
+    + Run(): void
+    + Stop(): void
 }
 
-class AutoMode{
-
-}
-
-class LowPowerMode {
-
-}
+Mode <|-- ManualControlMode
+Mode <|-- AutoMode
+Mode <|-- LowPowerMode
 
 
+StateMachine *-- State
 class StateMachine {
-
+    + StateMachine()
+    + Init(): void
+    + Run(): void
 }
 class Controller {
-  - Motor left_motor
-  - Motor right_motor
-  + std::pair MotorController(int throttle, int turn_angle)
-  + int HeadingPIDController(int heading)
-  + std::pair RCController()
+  + Controller()
+  + MotorController(int throttle, int turn_angle): std::pair
+  + HeadingPIDController(int heading): int
+  + RCController(int throttle_value, int yaw_value): std::pair
 }
 
 class State {
@@ -173,5 +175,5 @@ class State {
   MANUAL
   TERMINATE
 }
-``` -->
+```
 ## Hardware design
