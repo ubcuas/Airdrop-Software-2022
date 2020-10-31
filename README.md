@@ -44,11 +44,11 @@ gantt
     Proposal            :done,    des1, 2020-09-26,2020-10-03
     Design review 1            :done,  des2, 2020-10-03, 2020-10-17
     System design               :active,         des3, after des2, 3w
-    Design review 2              :         des4, after des3, 1w
+    Design review 2              :         des4, after des3, 2w
 
     section Implementation
     Divide tasks into modules :crit, done, imp1, 2020-10-17,7d
-    Deliver modules          :crit, done, after imp1, 7d
+    Deliver modules          :crit, done, after imp1, 10d
     Working on modules             :crit, active, imp2, after imp1, 3w
    	Submodule testing        :crit, after imp2, 2w
 
@@ -58,11 +58,10 @@ gantt
     Simulator logic testing    :crit, doc1, after s2  , 3w
 
     section Integration
-    Software integration test               :after doc1, 2w
-    Hardware Integration test				: 1w
-	System integration test					: 2w
+    Software integration               :after doc1, 2w
+    Hardware Integration				: 1w
+	System integration					: 2w
 ```
-
 
 ##  2. <a name='Development'></a>Development 
 
