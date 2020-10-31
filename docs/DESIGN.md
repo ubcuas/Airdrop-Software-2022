@@ -8,7 +8,7 @@
 
 We use mermaid as our diagram generator.
 
-```mermaid
+<!-- ```mermaid
 classDiagram
 class BankAccount{
     +String owner
@@ -32,7 +32,7 @@ class LowPowerMode {
 class StateMachine {
 
 }
-```
+``` -->
 
 ```mermaid
 classDiagram
