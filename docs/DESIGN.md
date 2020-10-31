@@ -17,11 +17,11 @@ class Sensor {
  <<interface>>
  +String sensor_name
  +bool connected
- bool CheckConnection()*
- void Attach()*
- void Update()*
- bool Calibrate()*
- bool Stop()*
+ +CheckConnection()*: bool
+ +Attach()$: void
+ +Update(): void
+ +Calibrate(): bool
+ +Stop(): bool
 }
 
 
