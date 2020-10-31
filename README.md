@@ -56,7 +56,9 @@ gantt
     Divide tasks into modules :crit, done, imp1, 2020-10-17,7d
     Deliver modules          :crit, done, after imp1, 10d
     Working on modules             :crit, active, imp2, after imp1, 3w
-   	Submodule testing        :crit, after imp2, 2w
+   	Submodule testing        :crit, imp3, after imp2, 2w
+    Manual Controll test          :crit, imp4, after imp3, 2w
+    GPS Controll test             :crit, imp5, after imp3, 3w
 
     section Simulator Testing
     Simulator set up               :done, s1, after des1, 1w
@@ -84,8 +86,6 @@ If you are interested in our software and hardware system design, please refer t
 ###  2.3. <a name='CodeStyleGuide'></a>Code Style Guide
 
 If you are curious about what our coding convention is, what coding style is acceptable or what's the preferred OOP standard, please see [Style Guide](docs/CODE_STANDARD.md)
-
-
 
 ##  3. <a name='Installation'></a>Installation
 
@@ -128,9 +128,13 @@ pio run -e teensy40 -t upload
 
 ####  3.1.2. <a name='Webotsproject'></a>Webots project
 
+- open the project
+- compile the code
+- run simulation and use keyboard to control.
+
 ###  3.2. <a name='Run'></a>Run
 
-TBC
+- upload the `latest` from `origin/master` to Teensy 4.0
 
 
 ###  3.3. <a name='Test'></a>Test

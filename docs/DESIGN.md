@@ -230,7 +230,8 @@ state AutoMode{
 }
 
 state ManualMode {
-  [*] --> [*]
+  [*] --> RCController
+  RCController --> RCController
 }
 
 ```
