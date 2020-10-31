@@ -6,6 +6,153 @@
 
 ### Diagram
 
-We use PlantUML as our diagram generator.
+We use mermaid as our diagram generator.
 
+```mermaid
+classDiagram
+class BankAccount{
+    +String owner
+    +BigDecimal balance
+    +deposit(amount) bool
+    +withdrawl(amount)
+}
+class ManualControlMode {
+
+}
+
+class AutoMode{
+
+}
+
+class LowPowerMode {
+
+}
+
+
+class StateMachine {
+
+}
+```
+
+```mermaid
+classDiagram
+
+class Controller {
+  - Motor left_motor
+  - Motor right_motor
+  + std::pair MotorController(int throttle, int turn_angle)
+  + int HeadingPIDController(int heading)
+  + std::pair RCController()
+}
+
+class State {
+  <<enumeration>>
+  LPM
+  DROP
+  LANDED
+  AUTO
+  MANUAL
+  TERMINATE
+}
+
+
+class Sensor {
+ <<interface>>
+ +String sensor_name
+ +bool connected
+ bool CheckConnection()*
+ void Attach()*
+ void Update()*
+ bool Calibrate()*
+ bool Stop()*
+}
+
+class Acuator {
+ <<interface>>
+ +String acuator_name
+ -bool connected
+ bool CheckConnection()*
+ bool Attach() *
+ bool ChangeInput(int input)*
+}
+
+
+RCReceiver *-- PWMReceiver
+class RCReceiver {
+  - PWMReceiver throttle
+  - PWMReceiver yaw
+  + int ReadThrottle()
+  + int ReadYaw()
+}
+
+Sensor <|-- PWMReceiver
+class PWMReceiver {
+  -int pwm_value
+  +int ReadRCValue()
+}
+
+Sensor <|-- PPMReceiver
+class PPMReceiver {
+  -int throttle_channel
+  -int yaw_channel
+  +int ReadThrottle()
+  +int ReadYaw()
+}
+
+Sensor <|-- BNO055
+class BNO055 {
+  -int current_heading
+  +int GetHeading()
+}
+
+
+Sensor <|-- GPS
+class GPS implements Sensor{
+  - TinyGPSPlus gps
+  - GPSCoordinate current_gps
+  + void WaitForGPSConnection()
+  + GPSCoordinate GetCurrentGPSCoordinate()
+}
+
+GPS o-- GPSCoordinate
+class GPSCoordinate {
+  - double latitude
+  - double longtitude
+  + GPS(double lat, double longi)
+  + double GetDistanceTo(GPS dest)
+  + double GetHeadingTo(GPS dest)
+  + double GetDistanceBetween(GPS source, GPS dest)$
+  + double GetHeadingBetween(GPS source, GPS dest)$
+}
+
+
+Sensor <|-- Altimeter
+class Altimeter {
+  - double current_altitude
+  + double GetCurrentAltitude()
+}
+
+
+Acuator <|-- Motor
+class Motor {
+  - bool direction
+  - double current_speed
+  - void ReverseMotor()
+}
+
+
+Sensor <|-- Encoder
+class Encoder {
+  - long current_tick
+
+}
+
+
+Acuator <|-- Servo
+class Servo {
+  - int current_angle
+  + int GetCurrentAngle()
+}
+
+```
 ## Hardware design
