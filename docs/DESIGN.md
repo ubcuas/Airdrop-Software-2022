@@ -2,13 +2,27 @@
 
 ---
 
-## Software design
+<!-- vscode-markdown-toc -->
+* 1. [Software design](#Softwaredesign)
+	* 1.1. [Diagram](#Diagram)
+		* 1.1.1. [Sensor class](#Sensorclass)
+		* 1.1.2. [Acuator class](#Acuatorclass)
 
-### Diagram
+<!-- vscode-markdown-toc-config
+	numbering=true
+	autoSave=true
+	/vscode-markdown-toc-config -->
+<!-- /vscode-markdown-toc -->
+
+
+
+##  1. <a name='Softwaredesign'></a>Software design
+
+###  1.1. <a name='Diagram'></a>Diagram
 
 > We use [mermaid](https://docs.gitlab.com/ee/user/markdown.html#diagrams-and-flowcharts-using-mermaid) as our diagram generator.
 
-Sensor class
+####  1.1.1. <a name='Sensorclass'></a>Sensor class
 ```mermaid
 classDiagram
 
@@ -17,8 +31,8 @@ class Sensor {
  <<interface>>
  +String sensor_name
  +bool connected
- +CheckConnection()*: bool
- +Attach()$: void
+ +CheckConnection(): bool
+ +Attach(): void
  +Update(): void
  +Calibrate(): bool
  +Stop(): bool
@@ -29,28 +43,28 @@ RCReceiver *-- PWMReceiver
 class RCReceiver {
   - PWMReceiver throttle
   - PWMReceiver yaw
-  + int ReadThrottle()
-  + int ReadYaw()
+  +ReadThrottle(): int
+  +ReadYaw(): int
 }
 
 Sensor <|-- PWMReceiver
 class PWMReceiver {
   -int pwm_value
-  +int ReadRCValue()
+  +ReadRCValue(): int
 }
 
 Sensor <|-- PPMReceiver
 class PPMReceiver {
   -int throttle_channel
   -int yaw_channel
-  +int ReadThrottle()
-  +int ReadYaw()
+  +ReadThrottle(): int
+  +ReadYaw(): int
 }
 
 Sensor <|-- BNO055
 class BNO055 {
   -int current_heading
-  +int GetHeading()
+  +GetHeading(): int
 }
 
 
@@ -58,8 +72,8 @@ Sensor <|-- GPS
 class GPS {
   - TinyGPSPlus gps
   - GPSCoordinate current_gps
-  + void WaitForGPSConnection()
-  + GPSCoordinate GetCurrentGPSCoordinate()
+  + WaitForGPSConnection(): void
+  + GetCurrentGPSCoordinate(): GPSCoordinate
 }
 
 GPS o-- GPSCoordinate
@@ -67,29 +81,28 @@ class GPSCoordinate {
   - double latitude
   - double longtitude
   + GPS(double lat, double longi)
-  + double GetDistanceTo(GPS dest)
-  + double GetHeadingTo(GPS dest)
-  + double GetDistanceBetween(GPS source, GPS dest)$
-  + double GetHeadingBetween(GPS source, GPS dest)$
+  + GetDistanceTo(GPS dest): double
+  + GetHeadingTo(GPS dest): double
+  + GetDistanceBetween(GPS source, GPS dest): double
+  + GetHeadingBetween(GPS source, GPS dest): double
 }
 
 
 Sensor <|-- Altimeter
 class Altimeter {
   - double current_altitude
-  + double GetCurrentAltitude()
+  + GetCurrentAltitude(): double
 }
 
 Sensor <|-- Encoder
 class Encoder {
   - long current_tick
-
 }
 
 
 ```
 
-Acuator class
+####  1.1.2. <a name='Acuatorclass'></a>Acuator class
 
 ```mermaid
 classDiagram
@@ -98,9 +111,9 @@ class Acuator {
  <<interface>>
  +String acuator_name
  -bool connected
- bool CheckConnection()*
- bool Attach() *
- bool ChangeInput(int input)*
+ +CheckConnection(): bool
+ +Attach(): void
+ +ChangeInput(int input): bool
 }
 
 
@@ -108,13 +121,13 @@ Acuator <|-- Motor
 class Motor {
   - bool direction
   - double current_speed
-  - void ReverseMotor()
+  -ReverseMotor(): void
 }
 
 Acuator <|-- Servo
 class Servo {
   - int current_angle
-  + int GetCurrentAngle()
+  +GetCurrentAngle(): int
 }
 ```
 
