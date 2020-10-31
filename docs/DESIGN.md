@@ -20,7 +20,7 @@
 
 ###  1.1. <a name='Diagram'></a>Diagram
 
-> We use [mermaid](https://docs.gitlab.com/ee/user/markdown.html#diagrams-and-flowcharts-using-mermaid) as our diagram generator.
+> We use [mermaid](https://docs.gitlab.com/ee/user/markdown.html#diagrams-and-flowcharts-using-mermaid) as our diagram generator. Read more about how to use it [here](https://mermaid-js.github.io/mermaid/overview/n00b-overview.html)
 
 ####  1.1.1. <a name='Sensorclass'></a>Sensor class
 ```mermaid
