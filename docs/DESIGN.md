@@ -3,10 +3,13 @@
 ---
 
 <!-- vscode-markdown-toc -->
-* 1. [Software design](#Softwaredesign)
-	* 1.1. [Diagram](#Diagram)
+* 1. [Rover Software design](#RoverSoftwaredesign)
+	* 1.1. [Class UML Diagram](#ClassUMLDiagram)
 		* 1.1.1. [Sensor class](#Sensorclass)
 		* 1.1.2. [Acuator class](#Acuatorclass)
+		* 1.1.3. [Controller class](#Controllerclass)
+	* 1.2. [State Diagram](#StateDiagram)
+* 2. [Hardware design](#Hardwaredesign)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -16,16 +19,15 @@
 
 
 
-##  1. <a name='Softwaredesign'></a>Software design
+##  1. <a name='RoverSoftwaredesign'></a>Rover Software design
 
-###  1.1. <a name='Diagram'></a>Diagram
+###  1.1. <a name='ClassUMLDiagram'></a>Class UML Diagram
 
 > We use [mermaid](https://docs.gitlab.com/ee/user/markdown.html#diagrams-and-flowcharts-using-mermaid) as our diagram generator. Read more about how to use it [here](https://mermaid-js.github.io/mermaid/overview/n00b-overview.html)
 
 ####  1.1.1. <a name='Sensorclass'></a>Sensor class
 ```mermaid
 classDiagram
-
 
 class Sensor {
  <<interface>>
@@ -136,7 +138,7 @@ class Servo {
   +GetCurrentAngle(): int
 }
 ```
-#### Controller class
+####  1.1.3. <a name='Controllerclass'></a>Controller class
 
 ```mermaid
 classDiagram
@@ -162,7 +164,7 @@ class StateMachine {
 class Controller {
   +Controller()
   +MotorController(int throttle, int turn_angle): std::pair
-  +ReadingPIDController(int heading): int
+  +HeadingPIDController(int heading): int
   +RCController(int throttle_value, int yaw_value): std::pair
 }
 
@@ -176,4 +178,61 @@ class State {
   TERMINATE
 }
 ```
-## Hardware design
+
+###  1.2. <a name='StateDiagram'></a>State Diagram
+```mermaid
+stateDiagram-v2
+[*] --> INIT
+
+state INIT {
+[*] --> RCReceiver.Attach()
+RCReceiver.Attach() --> GPS.Attach()
+GPS.Attach() --> BNO055.Attach()
+BNO055.Attach() --> Altimeter.Attach()
+Altimeter.Attach() --> Motor.Attach()
+Motor.Attach() --> [*]
+}
+
+INIT --> LPM
+
+state LPM {
+  [*] --> RCReceiver.Update()
+
+  RCReceiver.Update() --> RCReceiver.Update(): 100 HZ update
+
+--
+
+  [*] --> GPS.Update()
+  GPS.Update() --> GPS.Update(): 1HZ update
+
+--
+  [*] --> BNO055.Update()
+  BNO055.Update() --> BNO055.Update(): 10HZ
+}
+
+LPM --> CheckMode
+
+CheckMode --> AutoMode
+AutoMode --> CheckMode: mode change
+
+CheckMode --> ManualMode
+ManualMode --> CheckMode: mode change
+
+CheckMode --> LPM
+
+state AutoMode{
+  [*] --> Landingdetection
+  Landingdetection --> Landingdetection: false
+  Landingdetection --> HeadingController
+  HeadingController --> MotorController
+  MotorController --> HeadingController: not arrived
+  MotorController --> [*]: arrived
+}
+
+state ManualMode {
+  [*] --> [*]
+}
+
+```
+
+##  2. <a name='Hardwaredesign'></a>Hardware design

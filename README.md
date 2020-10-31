@@ -13,6 +13,8 @@
 	* 2.3. [Code Style Guide](#CodeStyleGuide)
 * 3. [Installation](#Installation)
 	* 3.1. [Build](#Build)
+		* 3.1.1. [Platformio project](#Platformioproject)
+		* 3.1.2. [Webots project](#Webotsproject)
 	* 3.2. [Run](#Run)
 	* 3.3. [Test](#Test)
 		* 3.3.1. [Software testing](#Softwaretesting)
@@ -34,6 +36,10 @@
 
 Welcome to UAV Airdrop software! We are the subteam in [UBC UAS](www.ubcuas.com) that is responsible for the Airdrop task section of the [AUVSI compeition](https://www.auvsi-suas.org/). This document will introduce you to our system and how we develop it, hopeful give you some insight on the project, as well as contributing to it as soon as possible.  
 
+Before you process to work on the project, please see this checklist of documents to read:
+  - [ ] [Development Workflow](docs/WORK_FLOW.md)
+  - [ ] [System overview](docs/DESIGN.md)
+  - [ ] 
 ```mermaid
 gantt
     title Timeline
@@ -102,7 +108,25 @@ Others
 
 ###  3.1. <a name='Build'></a>Build
 
-TBC
+####  3.1.1. <a name='Platformioproject'></a>Platformio project
+
+```bash
+# build the project
+pio run
+# or
+platformio run
+
+## build and upload
+pio run --target upload
+
+## build only certain environment
+pio run -e teensy40
+
+## build only teensy and upload it only
+pio run -e teensy40 -t upload
+```
+
+####  3.1.2. <a name='Webotsproject'></a>Webots project
 
 ###  3.2. <a name='Run'></a>Run
 
