@@ -6,54 +6,11 @@
 
 ### Diagram
 
-We use mermaid as our diagram generator.
+> We use [mermaid](https://docs.gitlab.com/ee/user/markdown.html#diagrams-and-flowcharts-using-mermaid) as our diagram generator.
 
-<!-- ```mermaid
-classDiagram
-class BankAccount{
-    +String owner
-    +BigDecimal balance
-    +deposit(amount) bool
-    +withdrawl(amount)
-}
-class ManualControlMode {
-
-}
-
-class AutoMode{
-
-}
-
-class LowPowerMode {
-
-}
-
-
-class StateMachine {
-
-}
-``` -->
-
+Sensor class
 ```mermaid
 classDiagram
-
-class Controller {
-  - Motor left_motor
-  - Motor right_motor
-  + std::pair MotorController(int throttle, int turn_angle)
-  + int HeadingPIDController(int heading)
-  + std::pair RCController()
-}
-
-class State {
-  <<enumeration>>
-  LPM
-  DROP
-  LANDED
-  AUTO
-  MANUAL
-  TERMINATE
-}
 
 
 class Sensor {
@@ -65,15 +22,6 @@ class Sensor {
  void Update()*
  bool Calibrate()*
  bool Stop()*
-}
-
-class Acuator {
- <<interface>>
- +String acuator_name
- -bool connected
- bool CheckConnection()*
- bool Attach() *
- bool ChangeInput(int input)*
 }
 
 
@@ -107,7 +55,7 @@ class BNO055 {
 
 
 Sensor <|-- GPS
-class GPS implements Sensor{
+class GPS {
   - TinyGPSPlus gps
   - GPSCoordinate current_gps
   + void WaitForGPSConnection()
@@ -132,6 +80,29 @@ class Altimeter {
   + double GetCurrentAltitude()
 }
 
+Sensor <|-- Encoder
+class Encoder {
+  - long current_tick
+
+}
+
+
+```
+
+Acuator class
+
+```mermaid
+classDiagram
+
+class Acuator {
+ <<interface>>
+ +String acuator_name
+ -bool connected
+ bool CheckConnection()*
+ bool Attach() *
+ bool ChangeInput(int input)*
+}
+
 
 Acuator <|-- Motor
 class Motor {
@@ -140,19 +111,54 @@ class Motor {
   - void ReverseMotor()
 }
 
-
-Sensor <|-- Encoder
-class Encoder {
-  - long current_tick
-
-}
-
-
 Acuator <|-- Servo
 class Servo {
   - int current_angle
   + int GetCurrentAngle()
 }
-
 ```
+
+
+<!-- ```mermaid
+classDiagram
+class BankAccount{
+    +String owner
+    +BigDecimal balance
+    +deposit(amount) bool
+    +withdrawl(amount)
+}
+class ManualControlMode {
+
+}
+
+class AutoMode{
+
+}
+
+class LowPowerMode {
+
+}
+
+
+class StateMachine {
+
+}
+class Controller {
+  - Motor left_motor
+  - Motor right_motor
+  + std::pair MotorController(int throttle, int turn_angle)
+  + int HeadingPIDController(int heading)
+  + std::pair RCController()
+}
+
+class State {
+  <<enumeration>>
+  LPM
+  DROP
+  LANDED
+  AUTO
+  MANUAL
+  TERMINATE
+}
+``` -->
 ## Hardware design
