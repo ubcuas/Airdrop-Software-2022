@@ -141,6 +141,8 @@ pio run -e teensy40 -t upload
 
 ####  3.3.1. <a name='Softwaretesting'></a>Software testing
 
+We use `platformio test` for running out unit test. See [platformio document](https://docs.platformio.org/en/latest/plus/unit-testing.html)
+
 ####  3.3.2. <a name='HITLHardwareintheloop'></a>HITL(Hardware in the loop)
 
 ####  3.3.3. <a name='SITLSoftwareintheloop'></a>SITL(Software in the loop)

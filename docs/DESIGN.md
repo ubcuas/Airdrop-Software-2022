@@ -14,7 +14,9 @@
 <!-- vscode-markdown-toc-config
 	numbering=true
 	autoSave=true
-	/vscode-markdown-toc-config -->
+
+###### 	/vscode-markdown-toc-config -->
+
 <!-- /vscode-markdown-toc -->
 
 
@@ -88,7 +90,7 @@ GPS o-- GPSCoordinate
 class GPSCoordinate {
   -double latitude
   -double longtitude
-  +GPS(double lat, double longi)
+  +GPSCoordinate(double lat, double longi)
   +GetDistanceTo(GPS dest): double
   +GetHeadingTo(GPS dest): double
   +GetDistanceBetween(GPS source, GPS dest): double

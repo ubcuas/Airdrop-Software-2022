@@ -1,11 +1,22 @@
 image: python:3.7
 
 stages:
+ - style-check
+ - compile
  - test
 
 before_script:
   - "pip install -U platformio && cd ./rover/Wall-E"
 
-job:
+check_style:
+  stage: style-check
+  script: "echo $WTF"
+
+compile_program:
+  stage: compile
+  script: "platformio run -e teensy40 -e uno -d ."
+
+unit_testing:
   stage: test
-  script: "platformio run -d ."
+  script: "echo $REMOTE_SO_HARD"
+  variables: {PLATFORMIO_CI_SRC: "."}
