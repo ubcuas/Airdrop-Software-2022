@@ -5,8 +5,21 @@ namespace sensor
 {
     namespace rc
     {
-        class PWMReciver : RCRecevier
+        class PWMReceiver : public RCReceiver
         {
+           private:
+           public:
+            using RCReceiver::RCReceiver;
+
+            virtual bool CheckConnection() override;
+
+            virtual void Attach() override;
+
+            virtual void Update() override;
+
+            virtual bool Calibrate() override;
+
+            virtual void Debug() override;
         };
     }  // namespace rc
 

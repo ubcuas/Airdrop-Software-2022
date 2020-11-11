@@ -4,6 +4,6 @@ namespace test
 {
     TestGPS::TestGPS()
     {
-        gps = std::make_shared<sensor::gps::AdafruitUltimateGPS>();
+        sensor::gps::AdafruitUltimateGPS gps = sensor::gps::AdafruitUltimateGPS("it's a test");
     }
 }  // namespace test

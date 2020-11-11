@@ -5,8 +5,14 @@ stages:
  - compile
  - test
 
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
 before_script:
-  - "pip install -U platformio && cd ./rover/Wall-E"
+  - git submodule sync --recursive
+  - git submodule update --init --recursive
+  - pip install -U platformio
+  - cd ./rover/Wall-E
 
 check_style:
   stage: style-check

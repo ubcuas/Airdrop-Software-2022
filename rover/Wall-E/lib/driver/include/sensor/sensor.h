@@ -11,12 +11,6 @@ namespace sensor
     class Sensor
     {
        private:
-        /**
-         * @brief Disable default constructor. Will give compilation error is used.
-         *
-         */
-        Sensor();
-
        public:
         String sensor_name;
         bool connected;
@@ -26,7 +20,7 @@ namespace sensor
          *
          * @param sensor_name
          */
-        Sensor(String sensor_name) : sensor_name(sensor_name) {}
+        explicit Sensor(String sensor_name) : sensor_name(sensor_name) {}
 
         // default operators: https://en.cppreference.com/w/cpp/language/rule_of_three
 
@@ -34,7 +28,7 @@ namespace sensor
          * @brief Destroy the Sensor object
          *
          */
-        virtual ~Sensor() noexcept = default;
+        ~Sensor() noexcept = default;
 
         /**
          * @brief Default copy constructor
@@ -103,5 +97,11 @@ namespace sensor
         {
             return false;
         }
+
+        /**
+         * @brief serial print the debug related
+         *
+         */
+        virtual void Debug() = 0;
     };
 }  // namespace sensor

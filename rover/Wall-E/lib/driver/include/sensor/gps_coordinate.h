@@ -7,7 +7,7 @@ namespace sensor
         {
            private:
             double latitude;
-            double longtitude;
+            double longitude;
 
            public:
             GPSCoordinate(double lat, double longi);

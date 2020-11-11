@@ -20,7 +20,6 @@
 <!-- /vscode-markdown-toc -->
 
 
-
 ##  1. <a name='RoverSoftwaredesign'></a>Rover Software design
 
 ###  1.1. <a name='ClassUMLDiagram'></a>Class UML Diagram
@@ -89,7 +88,7 @@ class GPS {
 GPS o-- GPSCoordinate
 class GPSCoordinate {
   -double latitude
-  -double longtitude
+  -double longitude
   +GPSCoordinate(double lat, double longi)
   +GetDistanceTo(GPS dest): double
   +GetHeadingTo(GPS dest): double
