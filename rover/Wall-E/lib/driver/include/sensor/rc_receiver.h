@@ -1,13 +1,19 @@
 #pragma once
 
-#include <sensor/rc_switch_mode.h>
 #include <sensor/sensor.h>
 
 namespace sensor
 {
     namespace rc
     {
-        class RCRecevier : sensor::Sensor
+        enum class RCSwitchMode
+        {
+            TERMINATE,
+            AUTO,
+            MANUAL
+        };
+
+        class RCReceiver : public sensor::Sensor
         {
            private:
             int throttle_channel;
@@ -18,11 +24,13 @@ namespace sensor
             int calibrate_yaw_min;
 
            public:
-            RCRecevier(String sensor_name);
+            using Sensor::Sensor;
             int ReadThrottle();
             int ReadYaw();
-            RCSwitchMode ReadRCSwtichMode();
+            RCSwitchMode ReadRCSwitchMode();
         };
+
+
     }  // namespace rc
 
 }  // namespace sensor

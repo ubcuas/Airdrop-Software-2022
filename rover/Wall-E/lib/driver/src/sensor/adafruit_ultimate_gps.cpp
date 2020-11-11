@@ -4,10 +4,36 @@ namespace sensor
 {
     namespace gps
     {
-        AdafruitUltimateGPS::AdafruitUltimateGPS(String sensor_name)
-            : sensor::Sensor(sensor_name)
+        bool AdafruitUltimateGPS::CheckConnection()
         {
-            // set up parameters or initilize objects
+            Serial.print(this->sensor_name);
+            Serial.println(" Checking Connection");
+            return false;
+        }
+
+        void AdafruitUltimateGPS::Attach()
+        {
+            Serial.print(this->sensor_name);
+            Serial.println(" Attach");
+        }
+
+        void AdafruitUltimateGPS::Update()
+        {
+            Serial.print(this->sensor_name);
+            Serial.println(" Update");
+        }
+
+        bool AdafruitUltimateGPS::Calibrate()
+        {
+            Serial.print(this->sensor_name);
+            Serial.println(" Calibrate");
+            return false;
+        }
+
+        void AdafruitUltimateGPS::Debug()
+        {
+            Serial.print(this->sensor_name);
+            Serial.println(" Debug");
         }
     }  // namespace gps
 

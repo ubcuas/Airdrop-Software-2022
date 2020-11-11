@@ -3,8 +3,6 @@
 #include <sensor/sensor.h>
 #include <unity.h>
 
-#include <memory>
-
 #include "test_driver/sensor/test_gps.h"
 #include "test_driver/test_sensor_driver.h"
 // void setUp(void) {
@@ -36,20 +34,17 @@ void test_led_state_low(void)
 
 void test_sensor_driver()
 {
-    std::shared_ptr<test::TestSensorDriver> test =
-        std::make_shared<test::TestSensorDriver>();
+    test::TestSensorDriver test = test::TestSensorDriver();
     TEST_ASSERT_EQUAL(255, pin::TEST_DUMMPY);
-    test->TestGPS();
-    test->TestCompass();
-    test->TestMotor();
-    test->TestRC();
+    test.TestGPS();
+    test.TestCompass();
+    test.TestMotor();
+    test.TestRC();
 }
 
 void test_gps_driver()
 {
-    test::TestGPS* gps = new test::TestGPS();
-    TEST_ASSERT_NOT_NULL(gps);
-    delete gps;
+    test::TestGPS gps = test::TestGPS();
 }
 
 
