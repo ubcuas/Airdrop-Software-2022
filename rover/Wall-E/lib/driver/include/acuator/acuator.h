@@ -70,27 +70,14 @@ namespace acuator
         virtual bool CheckConnection() = 0;
 
         /**
-         * @brief Activate the acuator pins. The pin number should be in pin_assignment.h
+         * @brief Activate the acuator pins. The pin numbers are in pin_assignment.h
          *
          */
         virtual void Attach() = 0;
 
         /**
-         * @brief Update the acuator data upon calling.
-         *
+         *  @Brief Change PWM Input to the Motor
          */
-        virtual void Update() = 0;
-
-        /**
-         * @brief Stop the acuator upon calling. It's optional
-         *
-         * @return true
-         * @return false
-         */
-        virtual bool Stop()
-        {
-            return false;
-        }
-        
+        virtual void ChangeInput(int input) = 0; 
     };
 }

@@ -4,43 +4,31 @@ namespace acuator
 {
     namespace motor
     {   
-        class DCMotor : acuator::Acuator
+        class DCMotor : public acuator::Acuator
         {
         private:
             bool direction;
             double current_speed; 
+            uint8_t pwm_pin;
+            uint8_t dir_a_pin;
+            uint8_t dir_b_pin;
 
         public:
-            /**
-             *  @Brief Initialize the DC motor object with all the required pins
-             */
-            DCMotor(String acuator_name);
+            DCMotor(String motor_name, bool use_motor1);
 
-            /**
-             *  @Brief Check Connection to the Motor
-             */
-            bool CheckConnection(void);
+            virtual bool CheckConnection(void) override;
 
-            /**
-             *  @Brief Initialize and Attach Pins to the Motor
-             */
-            void Attach(void);
+            virtual void Attach(void) override;
 
-            /**
-             *  @Brief Change PWM Input to the Motor
-             */
-            void ChangeInput(int input); 
+            virtual void ChangeInput(int input) override; 
             
-            /**
-             *  @Brief Reverse the Motor Spin Direction
-             */
             void ReverseMotor(void);
 
-            /**
-             *  @Brief Stop Motor from Spinning
-             */
+            double GetSpeed(void);
+
             void StopMotor(void);
 
+            bool GetDirection(void);
         };
     }
 }
