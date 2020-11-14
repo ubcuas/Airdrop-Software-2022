@@ -4,11 +4,8 @@
 #include <sensor/adafruit_ultimate_gps.h>
 #include <sensor/bno055.h>
 #include <sensor/ppm_receiver.h>
-<<<<<<< HEAD
-#include <controller/rover_controller.hpp>
-=======
+#include "controller/rover_controller.h"
 #include <actuator/dc_motor.h>
->>>>>>> 8216cd03421587fa160f0a57a7415ef741182a6b
 
 using namespace sensor;
 using namespace actuator;
@@ -140,8 +137,8 @@ void loop()
         switch (ppm_rc->ReadRCSwitchMode())
         {
             case rc::RCSwitchMode::MANUAL:
-                auto rc_result = rover_controller->RCController();
-                auto motor_result = rover_controller->MotorController(rc_result.first, rc_result.second);
+                auto rc_result = controller::RoverController::RCController(ppm_rc->ReadThrottle(), ppm_rc->ReadYaw());
+                auto motor_result = controller::RoverController::MotorController(rc_result.first, rc_result.second);
                 
                 break;
             case rc::RCSwitchMode::AUTO:
