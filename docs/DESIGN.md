@@ -79,10 +79,8 @@ class BNO055 {
 
 Sensor <|-- GPS
 class GPS {
-  -TinyGPSPlus gps
-  -GPSCoordinate current_gps
-  +WaitForGPSConnection(): void
-  +GetCurrentGPSCoordinate(): GPSCoordinate
+  -Adafruit gps
+  -GPSCoordinate* current_gps
 }
 
 GPS o-- GPSCoordinate
@@ -126,12 +124,23 @@ class Actuator {
 }
 
 
-Actuator <|-- Motor
-class Motor {
-  -bool direction
-  -double current_speed
-  -ReverseMotor(): void
+Actuator <|-- DCMotor
+class DCMotor {
+  -double current_velocity
+  -uint8_t pwm_pin
+  -uint8_t dir_b_pin
+  -uint8_t dir_a_pin
+  +DCMotor(String actuator_name, MotorMapping motor_location)
+  +GetVelocity() : double
+  +StopMotor() : void
 }
+DCMotor <|-- MotorMapping
+class MotorMapping{
+  <<enumeration>>
+  LEFT_MOTOR
+  RIGHT_MOTOR
+}
+
 
 Actuator <|-- Servo
 class Servo {
@@ -197,18 +206,18 @@ Motor.Attach() --> [*]
 INIT --> LPM
 
 state LPM {
-  [*] --> RCReceiver.Update()
+  [*] --> BN005.Update
+  BN005.Update --> GPS.Update
+  GPS.Update --> BN005.Update: 250HZ update
+  --
 
-  RCReceiver.Update() --> RCReceiver.Update(): 100 HZ update
+  [*] --> GPS.Read
+  GPS.Read --> GPS.Read: 1HZ update
 
---
-
-  [*] --> GPS.Update()
-  GPS.Update() --> GPS.Update(): 1HZ update
-
---
-  [*] --> BNO055.Update()
-  BNO055.Update() --> BNO055.Update(): 10HZ
+  --
+  
+  [*] --> RCReceiver.Update
+  RCReceiver.Update --> RCReceiver.Update: 10HZ update
 }
 
 LPM --> CheckMode
@@ -222,9 +231,9 @@ ManualMode --> CheckMode: mode change
 CheckMode --> LPM
 
 state AutoMode{
-  [*] --> Landingdetection
-  Landingdetection --> Landingdetection: false
-  Landingdetection --> HeadingController
+  [*] --> LandingDetection
+  LandingDetection --> LandingDetection: false
+  LandingDetection --> HeadingController
   HeadingController --> MotorController
   MotorController --> HeadingController: not arrived
   MotorController --> [*]: arrived
