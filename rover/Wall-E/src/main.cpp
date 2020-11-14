@@ -70,11 +70,15 @@ static THD_FUNCTION(Thread3, arg)
         if (connected)
         {
             rover_compass->Update();
-            connected &= rover_compass->CheckConnection();
-            connected &= rover_gps->CheckConnection();
-            connected &= ppm_rc->CheckConnection();
-            connected &= rover_compass->CheckConnection();
-            connected = true;
+
+            // TODO: figure out motor update frequency
+            left_motor->Update();
+            right_motor->Update();
+            // connected &= rover_compass->CheckConnection();
+            // connected &= rover_gps->CheckConnection();
+            // connected &= ppm_rc->CheckConnection();
+            // connected &= rover_compass->CheckConnection();
+            // connected = true;
             chThdSleepMilliseconds(timing::SLOW_TASK_MS);
         }
     }
@@ -96,7 +100,8 @@ void setup()
     rover_gps     = new gps::AdafruitUltimateGPS("gps");
     ppm_rc        = new rc::PPMReceiver("ppm rc receiver");
     left_motor    = new motor::DCMotor("left_motor", motor::MotorMapping::LEFT_MOTOR);
-    left_motor    = new motor::DCMotor("left_motor", motor::MotorMapping::LEFT_MOTOR);
+    right_motor    = new motor::DCMotor("right_motor", motor::MotorMapping::RIGHT_MOTOR);
+
     Serial.println("=============== AUVSI Rover ======================");
 
     rover_gps->Attach();
