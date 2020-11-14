@@ -4,12 +4,15 @@
 #include <sensor/adafruit_ultimate_gps.h>
 #include <sensor/bno055.h>
 #include <sensor/ppm_receiver.h>
+#include <controller/rover_controller.hpp>
 
 using namespace sensor;
 
 gps::AdafruitUltimateGPS* rover_gps;
 compass::BNO055Compass* rover_compass;
 rc::PPMReceiver* ppm_rc;
+
+controller::RoverController * rover_controller;
 
 bool connected = false;
 bool led_state = false;
@@ -92,6 +95,8 @@ void setup()
     rover_compass = new compass::BNO055Compass("bno055");
     rover_gps     = new gps::AdafruitUltimateGPS("gps");
     ppm_rc        = new rc::PPMReceiver("ppm rc receiver");
+    
+    rover_controller = new controller::RoverController();
 
     Serial.println("=============== AUVSI Rover ======================");
 
@@ -123,6 +128,9 @@ void loop()
         switch (ppm_rc->ReadRCSwitchMode())
         {
             case rc::RCSwitchMode::MANUAL:
+                auto rc_result = rover_controller->RCController();
+                auto motor_result = rover_controller->MotorController(rc_result.first, rc_result.second);
+                
                 break;
             case rc::RCSwitchMode::AUTO:
                 break;
