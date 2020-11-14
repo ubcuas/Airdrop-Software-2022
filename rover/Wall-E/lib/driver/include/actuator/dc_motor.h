@@ -37,8 +37,6 @@ namespace actuator
              */
             virtual void ChangeInput(int input) override;
 
-            void ReverseMotor();
-
             double GetVelocity() const;
 
             void StopMotor();
