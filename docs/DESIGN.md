@@ -6,7 +6,7 @@
 * 1. [Rover Software design](#RoverSoftwaredesign)
 	* 1.1. [Class UML Diagram](#ClassUMLDiagram)
 		* 1.1.1. [Sensor class](#Sensorclass)
-		* 1.1.2. [Acuator class](#Acuatorclass)
+		* 1.1.2. [Actuator class](#Actuatorclass)
 		* 1.1.3. [Controller class](#Controllerclass)
 	* 1.2. [State Diagram](#StateDiagram)
 * 2. [Hardware design](#Hardwaredesign)
@@ -111,14 +111,14 @@ class Encoder {
 
 ```
 
-####  1.1.2. <a name='Acuatorclass'></a>Acuator class
+####  1.1.2. <a name='Actuatorclass'></a>Actuator class
 
 ```mermaid
 classDiagram
 
-class Acuator {
+class Actuator {
  <<interface>>
- +String acuator_name
+ +String actuator_name
  -bool connected
  +CheckConnection(): bool
  +Attach(): void
@@ -126,14 +126,14 @@ class Acuator {
 }
 
 
-Acuator <|-- Motor
+Actuator <|-- Motor
 class Motor {
   -bool direction
   -double current_speed
   -ReverseMotor(): void
 }
 
-Acuator <|-- Servo
+Actuator <|-- Servo
 class Servo {
   -int current_angle
   +GetCurrentAngle(): int

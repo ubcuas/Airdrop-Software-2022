@@ -4,12 +4,15 @@
 #include <sensor/adafruit_ultimate_gps.h>
 #include <sensor/bno055.h>
 #include <sensor/ppm_receiver.h>
+#include <actuator/dc_motor.h>
 
 using namespace sensor;
-
+using namespace actuator;
 gps::AdafruitUltimateGPS* rover_gps;
 compass::BNO055Compass* rover_compass;
 rc::PPMReceiver* ppm_rc;
+motor::DCMotor* left_motor;
+motor::DCMotor* right_motor;
 
 bool connected = false;
 bool led_state = false;
@@ -67,11 +70,15 @@ static THD_FUNCTION(Thread3, arg)
         if (connected)
         {
             rover_compass->Update();
-            connected &= rover_compass->CheckConnection();
-            connected &= rover_gps->CheckConnection();
-            connected &= ppm_rc->CheckConnection();
-            connected &= rover_compass->CheckConnection();
-            connected = true;
+
+            // TODO: figure out motor update frequency
+            left_motor->Update();
+            right_motor->Update();
+            // connected &= rover_compass->CheckConnection();
+            // connected &= rover_gps->CheckConnection();
+            // connected &= ppm_rc->CheckConnection();
+            // connected &= rover_compass->CheckConnection();
+            // connected = true;
             chThdSleepMilliseconds(timing::SLOW_TASK_MS);
         }
     }
@@ -92,6 +99,8 @@ void setup()
     rover_compass = new compass::BNO055Compass("bno055");
     rover_gps     = new gps::AdafruitUltimateGPS("gps");
     ppm_rc        = new rc::PPMReceiver("ppm rc receiver");
+    left_motor    = new motor::DCMotor("left_motor", motor::MotorMapping::LEFT_MOTOR);
+    right_motor    = new motor::DCMotor("right_motor", motor::MotorMapping::RIGHT_MOTOR);
 
     Serial.println("=============== AUVSI Rover ======================");
 
