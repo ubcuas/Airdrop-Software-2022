@@ -1,11 +1,12 @@
 #include <Arduino.h>
 #include <ChRt.h>
+#include <actuator/dc_motor.h>
 #include <constants.h>
 #include <sensor/adafruit_ultimate_gps.h>
 #include <sensor/bno055.h>
 #include <sensor/ppm_receiver.h>
+
 #include "controller/rover_controller.h"
-#include <actuator/dc_motor.h>
 
 using namespace sensor;
 using namespace actuator;
@@ -15,7 +16,7 @@ rc::PPMReceiver* ppm_rc;
 motor::DCMotor* left_motor;
 motor::DCMotor* right_motor;
 
-controller::RoverController * rover_controller;
+controller::RoverController* rover_controller;
 
 bool connected = false;
 bool led_state = false;
@@ -102,10 +103,10 @@ void setup()
     rover_compass = new compass::BNO055Compass("bno055");
     rover_gps     = new gps::AdafruitUltimateGPS("gps");
     ppm_rc        = new rc::PPMReceiver("ppm rc receiver");
-    
+
     rover_controller = new controller::RoverController();
-    left_motor    = new motor::DCMotor("left_motor", motor::MotorMapping::LEFT_MOTOR);
-    right_motor    = new motor::DCMotor("right_motor", motor::MotorMapping::RIGHT_MOTOR);
+    left_motor       = new motor::DCMotor("left_motor", motor::MotorMapping::LEFT_MOTOR);
+    right_motor = new motor::DCMotor("right_motor", motor::MotorMapping::RIGHT_MOTOR);
 
     Serial.println("=============== AUVSI Rover ======================");
 
@@ -137,14 +138,24 @@ void loop()
         switch (ppm_rc->ReadRCSwitchMode())
         {
             case rc::RCSwitchMode::MANUAL:
-                auto rc_result = controller::RoverController::RCController(ppm_rc->ReadThrottle(), ppm_rc->ReadYaw());
-                auto motor_result = controller::RoverController::MotorController(rc_result.first, rc_result.second);
-                
-                break;
-            case rc::RCSwitchMode::AUTO:
-                break;
-            case rc::RCSwitchMode::TERMINATE:
+            {
+                auto rc_result = controller::RoverController::RCController(
+                    ppm_rc->ReadThrottle(), ppm_rc->ReadYaw());
+                auto motor_result = controller::RoverController::MotorController(
+                    rc_result.first, rc_result.second);
+                left_motor->ChangeInput(motor_result.first);
+                right_motor->ChangeInput(motor_result.second);
 
+                break;
+            }
+            case rc::RCSwitchMode::AUTO:
+            {
+                break;
+            }
+
+            case rc::RCSwitchMode::TERMINATE:
+            {
+            }
             default:
                 break;
         }
