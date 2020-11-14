@@ -22,10 +22,10 @@ compile_teensy:
   stage: compile
   script: "platformio run -e teensy40 -d ."
 
-compile_uno:
-  stage: compile
-  script: "platformio run -e uno -d ."
-  allow_failure: true
+# compile_uno:
+#   stage: compile
+#   script: "platformio run -e uno -d ."
+#   allow_failure: true
 
 unit_testing:
   stage: test
