@@ -18,9 +18,14 @@ check_style:
   stage: style-check
   script: "echo $WTF"
 
-compile_program:
+compile_teensy:
   stage: compile
-  script: "platformio run -e teensy40 -e uno -d ."
+  script: "platformio run -e teensy40 -d ."
+
+# compile_uno:
+#   stage: compile
+#   script: "platformio run -e uno -d ."
+#   allow_failure: true
 
 unit_testing:
   stage: test
