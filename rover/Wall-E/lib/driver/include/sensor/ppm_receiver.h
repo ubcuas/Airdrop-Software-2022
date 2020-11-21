@@ -1,15 +1,13 @@
 #pragma once
-
+#include <Arduino.h>
 #include <sensor/rc_receiver.h>
+
 namespace sensor
 {
     namespace rc
     {
         class PPMReceiver : public RCReceiver
         {
-           private:
-            
-
            public:
             using RCReceiver::RCReceiver;
 

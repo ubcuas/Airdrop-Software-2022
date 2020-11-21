@@ -1,3 +1,5 @@
+#include <constants.h>
+#include <pin_assignment.h>
 #include <sensor/rc_receiver.h>
 
 namespace sensor
@@ -6,22 +8,31 @@ namespace sensor
     {
         int RCReceiver::ReadThrottle()
         {
-            Serial.print(this->sensor_name);
-            Serial.println(" Read throttle");
-            return -1;
+            return this->throttle_channel_value;
         }
         int RCReceiver::ReadYaw()
         {
-            Serial.print(this->sensor_name);
-            Serial.println(" Read Yaw");
-            return -1;
+            return this->yaw_channel_value;
         }
+
         RCSwitchMode RCReceiver::ReadRCSwitchMode()
         {
-            Serial.print(this->sensor_name);
-            Serial.println(" Read Mode");
-            return RCSwitchMode::TERMINATE;
+            if (this->switch_channel_value > magic::AUTO_MODE - magic::ERROR_MARGIN &&
+                this->switch_channel_value < magic::AUTO_MODE + magic::ERROR_MARGIN)
+            {
+                return RCSwitchMode::AUTO;
+            }
+            else if (this->switch_channel_value >
+                         magic::TERMINATE_SIGNAL - magic::ERROR_MARGIN &&
+                     this->switch_channel_value <
+                         magic::TERMINATE_SIGNAL + magic::ERROR_MARGIN)
+            {
+                return RCSwitchMode::TERMINATE;
+            }
+            else
+            {
+                return RCSwitchMode::MANUAL;
+            }
         }
     }  // namespace rc
-
 }  // namespace sensor

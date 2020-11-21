@@ -18,6 +18,14 @@ namespace timing
 
 namespace estimation
 {
-    const static double DEFAULT_GPS_LATITUDE = 0;
+    const static double DEFAULT_GPS_LATITUDE  = 0;
     const static double DEFAULT_GPS_LONGITUDE = 0;
 }  // namespace estimation
+
+namespace magic
+{
+    const static unsigned int HIGH_READING = 1000;
+    const static int AUTO_MODE = 1000;
+    const static int TERMINATE_SIGNAL = 2000;
+    const static int ERROR_MARGIN = 100;
+}

@@ -1,4 +1,5 @@
 #pragma once
+#include <Arduino.h>
 #include <sensor/rc_receiver.h>
 
 namespace sensor
@@ -7,7 +8,6 @@ namespace sensor
     {
         class PWMReceiver : public RCReceiver
         {
-           private:
            public:
             using RCReceiver::RCReceiver;
 
@@ -21,6 +21,7 @@ namespace sensor
 
             virtual void Debug() override;
         };
+
     }  // namespace rc
 
 }  // namespace sensor
