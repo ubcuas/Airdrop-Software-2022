@@ -92,5 +92,9 @@ namespace sensor
             return degrees(a2);
         }
 
+        std::pair<double, double> GPSCoordinate::ConvertToPair() const {
+            return std::make_pair(GPSCoordinate::GetLatitude(), GPSCoordinate::GetLongitude());
+        }
+
     }  // namespace gps
 }  // namespace sensor

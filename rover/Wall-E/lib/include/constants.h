@@ -20,4 +20,8 @@ namespace estimation
 {
     const static double DEFAULT_GPS_LATITUDE = 0;
     const static double DEFAULT_GPS_LONGITUDE = 0;
+    const static double DEFAULT_FINAL_LATITUDE = 0;
+    const static double DEFAULT_FINAL_LONGITUDE = 0;
+    const static double INTERMEDIATE_WAYPOINT_THRESHOLD = 5;
+    const static double FINAL_WAYPOINT_THRESHOLD = 1;
 }  // namespace estimation

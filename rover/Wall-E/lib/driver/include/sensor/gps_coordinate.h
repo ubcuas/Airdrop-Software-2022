@@ -30,6 +30,7 @@ namespace sensor
             static double GetHeadingBetween(GPSCoordinate src, GPSCoordinate dest);
             static double DistanceBetween(double lat1, double long1, double lat2, double long2);
             static double CourseTo(double lat1, double long1, double lat2, double long2);
+            std::pair<double, double> ConvertToPair() const;
         };
     }  // namespace gps
 

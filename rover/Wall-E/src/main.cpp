@@ -6,8 +6,10 @@
 #include <sensor/adafruit_ultimate_gps.h>
 #include <sensor/bno055.h>
 #include <sensor/ppm_receiver.h>
+#include <queue>
 
 #include "controller/rover_controller.h"
+
 
 using namespace sensor;
 using namespace actuator;
@@ -18,6 +20,10 @@ motor::DCMotor* left_motor;
 motor::DCMotor* right_motor;
 servo::Servo* drop_servo;
 controller::RoverController* rover_controller;
+std::queue<sensor::gps::GPSCoordinate> intermediate_waypoints{
+    new sensor::gps::GPSCoordinate(estimation::DEFAULT_FINAL_LATITUDE, estimation::DEFAULT_FINAL_LONGITUDE)
+};
+sensor::gps::GPSCoordinate final_waypoint(estimation::DEFAULT_FINAL_LATITUDE, estimation::DEFAULT_FINAL_LONGITUDE);
 
 bool connected = true;
 bool led_state = false;
@@ -122,8 +128,10 @@ void setup()
     }
 }
 
-bool has_landed = false;
-bool has_arrived = false;
+bool has_landed {false};
+bool final_arrive {false};
+bool to_final_waypoint {intermediate_waypoints.size == 0};
+sensor::gps::GPSCoordinate* next_waypoint{(intermediate_waypoints.size > 0) ? intermediate_waypoints.front() : final_waypoint};
 uint32_t gpsTimer = millis();
 
 void loop()
@@ -149,16 +157,37 @@ void loop()
                     rover_controller->LandingDetectionUpdate();
                     has_landed = rover_controller->GetLandingStatus();
                 } else {
-                    if (!has_arrived)
+                    if (!final_arrived)
                     {
-                        
-
-                        auto motor_result{controller::RoverController::MotorController(speed, turn_angle)};
+                        auto current_coordinate{rover_gps->GetCurrentGPSCoordinate()};
+                        auto target_coordinate{next_waypoint.ConvertToPair()};
+                        auto auto_result{controller::RoverController::AutoController(current_coordinate, target_coordinate)};
+                        auto motor_result{controller::RoverController::MotorController(auto_result.first, auto_result.second)};
                         left_motor->ChangeInput(motor_result.first);
                         right_motor->ChangeInput(motor_result.second);
 
-                        rover_controller->ArrivalDetectionUpdate();
-                        has_arrived = rover_controller->GetArrivalStatus();
+                        double distance_threshold{(to_final_waypoint) ? estimation::FINAL_WAYPOINT_THRESHOLD : estimation::INTERMEDIATE_WAYPOINT_THRESHOLD};
+                        if (controller::RoverController::ReachedWaypoint(current_coordinate, target_coordinate, distance_threshold))
+                        {
+                            if (to_final_waypoint)
+                            {
+                                final_arrive = true;
+                            }
+                            else
+                            {
+                                intermediate_waypoints.pop();
+                                if (intermediate_waypoints.size() > 0)
+                                {
+                                    next_waypoint = intermediate_waypoints.front();
+                                }
+                                else
+                                {
+                                    next_waypoint = final_waypoint;
+                                    to_final_waypoint = true;
+                                }
+                            }
+                            
+                        }
                     }
                 }
                 break;
