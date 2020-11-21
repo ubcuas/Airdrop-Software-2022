@@ -28,7 +28,7 @@ namespace sensor
          * @brief Destroy the Sensor object
          *
          */
-        ~Sensor() noexcept = default;
+        virtual ~Sensor() noexcept = default;
 
         /**
          * @brief Default copy constructor

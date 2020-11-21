@@ -1,6 +1,6 @@
 #pragma once
-#include <sensor/rc_receiver.h>
 
+#include <sensor/rc_receiver.h>
 namespace sensor
 {
     namespace rc
@@ -8,6 +8,8 @@ namespace sensor
         class PPMReceiver : public RCReceiver
         {
            private:
+            
+
            public:
             using RCReceiver::RCReceiver;
 

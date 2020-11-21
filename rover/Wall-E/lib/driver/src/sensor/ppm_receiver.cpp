@@ -1,5 +1,8 @@
+#include <PulsePosition.h>
+#include <pin_assignment.h>
 #include <sensor/ppm_receiver.h>
 
+PulsePositionInput ppm_input;
 namespace sensor
 {
     namespace rc
@@ -13,14 +16,13 @@ namespace sensor
 
         void PPMReceiver::Attach()
         {
-            Serial.print(this->sensor_name);
-            Serial.println(" Attach");
+            ppm_input.begin(pin::RC_INPUT);
         }
 
         void PPMReceiver::Update()
         {
-            Serial.print(this->sensor_name);
-            Serial.println(" Update");
+            throttle_channel = ppm_input.read(3);
+            yaw_channel      = ppm_input.read(4);
         }
 
         bool PPMReceiver::Calibrate()
@@ -32,8 +34,10 @@ namespace sensor
 
         void PPMReceiver::Debug()
         {
-            Serial.print(this->sensor_name);
-            Serial.println(" Debug");
+            Serial.println("PPM RC ==================");
+            Serial.println(throttle_channel);
+            Serial.println(yaw_channel);
+            Serial.println("===================");
         }
     }  // namespace rc
 
