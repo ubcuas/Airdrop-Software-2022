@@ -159,8 +159,7 @@ void loop()
                 } else {
                     if (!has_arrived)
                     {
-                        float turn_angle{rover_controller->HeadingController()};
-                        float speed{ /* FILL IN SPEED CALCULATION */ };
+                        
 
                         auto motor_result{controller::RoverController::MotorController(speed, turn_angle)};
                         left_motor->ChangeInput(motor_result.first);

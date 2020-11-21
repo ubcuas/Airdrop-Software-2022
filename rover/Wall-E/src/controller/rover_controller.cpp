@@ -11,4 +11,11 @@ namespace controller
     {
         return std::make_pair(0, 0);
     }
+    std::pair<double, double> RoverController::AutoController(sensor::gps::GPSCoordinate src, sensor::gps::GPSCoordinate dest)
+    {
+        double throttle = 100;
+        double turn_angle{HeadingController(src, dest)};
+
+        return std::make_pair(throttle, turn_angle);
+    }
 }  // namespace controller
