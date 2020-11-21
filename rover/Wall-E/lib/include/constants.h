@@ -18,4 +18,6 @@ namespace timing
 
 namespace estimation
 {
+    const static double DEFAULT_GPS_LATITUDE = 0;
+    const static double DEFAULT_GPS_LONGITUDE = 0;
 }  // namespace estimation

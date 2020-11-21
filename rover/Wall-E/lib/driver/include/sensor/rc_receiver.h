@@ -13,11 +13,12 @@ namespace sensor
             MANUAL
         };
 
-        class RCReceiver : public sensor::Sensor
+        class RCReceiver : public Sensor
         {
-           private:
+           protected:
             int throttle_channel;
             int yaw_channel;
+
             int calibrate_throttle_max;
             int calibrate_throttle_min;
             int calibrate_yaw_max;

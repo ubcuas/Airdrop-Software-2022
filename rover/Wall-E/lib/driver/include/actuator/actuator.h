@@ -12,12 +12,6 @@ namespace actuator
     class Actuator
     {
        private:
-        /**
-         * @brief Disable default constructor. Will give compilation error is used.
-         *
-         */
-        Actuator();
-
        public:
         String actuator_name;
         bool connected;
@@ -27,7 +21,7 @@ namespace actuator
          *
          * @param actuator_name
          */
-        Actuator(String actuator_name) : actuator_name(actuator_name) {}
+        explicit Actuator(String actuator_name) : actuator_name(actuator_name) {}
 
         /**
          * @brief Destroy the Actuator object
