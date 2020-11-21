@@ -21,5 +21,15 @@ namespace controller
             
             bool GetLandingStatus();
 
+            /**
+             * Calculates the necessary turn angle / heading difference between the target heading and current heading
+             * @returns the angle 
+             */
+            float HeadingController();
+
+            void ArrivalDetectionUpdate();
+
+            bool GetArrivalStatus();
+
     };
 } // namespace controller

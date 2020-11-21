@@ -106,7 +106,7 @@ void setup()
 
     rover_controller = new controller::RoverController();
     left_motor       = new motor::DCMotor("left_motor", motor::MotorMapping::LEFT_MOTOR);
-    right_motor = new motor::DCMotor("right_motor", motor::MotorMapping::RIGHT_MOTOR);
+    right_motor      = new motor::DCMotor("right_motor", motor::MotorMapping::RIGHT_MOTOR);
 
     Serial.println("=============== AUVSI Rover ======================");
 
@@ -130,6 +130,9 @@ void setup()
     }
 }
 
+bool has_landed = false;
+bool has_arrived = false;
+
 void loop()
 {
     if (connected)
@@ -150,6 +153,23 @@ void loop()
             }
             case rc::RCSwitchMode::AUTO:
             {
+                if (!has_landed) {
+                    rover_controller->LandingDetectionUpdate();
+                    has_landed = rover_controller->GetLandingStatus();
+                } else {
+                    if (!has_arrived)
+                    {
+                        float turn_angle{rover_controller->HeadingController()};
+                        float speed{ /* FILL IN SPEED CALCULATION */ };
+
+                        auto motor_result{controller::RoverController::MotorController(speed, turn_angle)};
+                        left_motor->ChangeInput(motor_result.first);
+                        right_motor->ChangeInput(motor_result.second);
+
+                        rover_controller->ArrivalDetectionUpdate();
+                        has_arrived = rover_controller->GetArrivalStatus();
+                    }
+                }
                 break;
             }
 
