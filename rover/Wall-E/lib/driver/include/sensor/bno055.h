@@ -6,7 +6,7 @@ namespace sensor
 {
     namespace compass
     {
-        class BNO055Compass : public sensor::Sensor
+        class BNO055Compass : public Sensor
         {
            private:
            public:

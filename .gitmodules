@@ -1,3 +1,6 @@
 [submodule "rover/Wall-E/lib/ChRt"]
 	path = rover/Wall-E/lib/ChRt
 	url = https://github.com/greiman/ChRt.git
+[submodule "rover/Wall-E/lib/PulsePosition"]
+	path = rover/Wall-E/lib/PulsePosition
+	url = https://github.com/PaulStoffregen/PulsePosition.git
