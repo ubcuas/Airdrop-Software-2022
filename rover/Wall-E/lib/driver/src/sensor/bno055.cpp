@@ -54,7 +54,7 @@ namespace sensor
                 return false;
             }
 
-            return true
+            return true;
         }
 
         void BNO055Compass::Debug()

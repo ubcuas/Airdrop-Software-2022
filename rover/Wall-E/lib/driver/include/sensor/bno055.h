@@ -12,8 +12,11 @@ namespace sensor
         class BNO055Compass : public Sensor
         {
            private:
+            Adafruit_BNO055 imu = Adafruit_BNO055();
+            int current_heading;
+
            public:
-            using Sensor::Sensor;
+            BNO055Compass(String sensor_name);
 
             virtual bool CheckConnection() override;
 
@@ -24,6 +27,8 @@ namespace sensor
             virtual bool Calibrate() override;
 
             virtual void Debug() override;
+
+            int getHeading();
         };
     }  // namespace compass
 
