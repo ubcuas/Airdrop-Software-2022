@@ -14,6 +14,9 @@ namespace sensor
            private:
             Adafruit_BNO055 imu = Adafruit_BNO055();
             int current_heading;
+            imu::Vector<3> acc;
+            imu::Vector<3> gyr;
+            imu::Vector<3> mag;
 
            public:
             BNO055Compass(String sensor_name);

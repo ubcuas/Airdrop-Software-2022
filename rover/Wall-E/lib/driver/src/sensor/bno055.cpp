@@ -10,6 +10,7 @@ namespace sensor
         BNO055Compass::BNO055Compass(String sensor_name)
         : Sensor::Sensor(sensor_name)
         {
+            imu.setExtCrystalUse(true);
             current_heading = 0;
         }
 
@@ -28,16 +29,21 @@ namespace sensor
 
         void BNO055Compass::Attach()
         {
-            //Wire wires = Wire();
-            //wires.setSCL(pin::BNO055_SCL);
-            //wires.setSDA(pin::BNO055_SDA);
-
+            Wire.setSCL(pin::BNO055_SCL); 
+            Wire.setSDA(pin::BNO055_SDA); 
+            Wire.beginTransmission(0x28);
+            imu.begin();
             Serial.print(this->sensor_name);
             Serial.println(" Attach");
         }
 
         void BNO055Compass::Update()
         {
+            acc = imu.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
+            gyr = imu.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
+            mag = imu.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
+
+            current_heading = atan2(mag.y(),mag.x());
             Serial.print(this->sensor_name);
             Serial.println(" Update");
         }
@@ -67,7 +73,10 @@ namespace sensor
         {
             Serial.print(this->sensor_name);
             Serial.println(" Get Heading");
+            return current_heading;
         }
+
+
     }  // namespace compass
 
 }  // namespace sensor
