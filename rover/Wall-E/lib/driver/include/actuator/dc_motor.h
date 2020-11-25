@@ -9,7 +9,7 @@ namespace actuator
             LEFT_MOTOR,
             RIGHT_MOTOR
         };
-        class DCMotor : public actuator::Actuator
+        class DCMotor : public Actuator
         {
            private:
             double current_velocity;
