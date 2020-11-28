@@ -19,6 +19,8 @@ namespace sensor
             int throttle_channel_value;
             int yaw_channel_value;
             int switch_channel_value;
+
+            // constants after calibrating the RC input. 
             int calibrate_throttle_max;
             int calibrate_throttle_min;
             int calibrate_yaw_max;
