@@ -24,7 +24,7 @@ bool led_state = false;
 
 MUTEX_DECL(dataMutex);
 
-static THD_WORKING_AREA(GPSThread, 32);
+static THD_WORKING_AREA(GPSThread, 200);
 
 static THD_FUNCTION(Thread0, arg)
 {
@@ -33,13 +33,13 @@ static THD_FUNCTION(Thread0, arg)
     {
         if (connected)
         {
-            rover_gps->Read();
+            // rover_gps->Read();
             chThdSleepMilliseconds(timing::GPS_TRACKING_MS);
         }
     }
 }
 
-static THD_WORKING_AREA(EstimationThread, 32);
+static THD_WORKING_AREA(EstimationThread, 200);
 
 static THD_FUNCTION(Thread1, arg)
 {
@@ -48,13 +48,14 @@ static THD_FUNCTION(Thread1, arg)
     {
         if (connected)
         {
-            rover_gps->Update();
+            // rover_gps->Update();
+            rover_compass->Update();
             chThdSleepMilliseconds(timing::ESTIMATION_TASK_MS);
         }
     }
 }
 
-static THD_WORKING_AREA(SlowThread, 64);
+static THD_WORKING_AREA(SlowThread, 200);
 
 static THD_FUNCTION(Thread2, arg)
 {
@@ -63,17 +64,10 @@ static THD_FUNCTION(Thread2, arg)
     {
         if (connected)
         {
-            rover_compass->Update();
-
             // TODO: figure out motor update frequency
             left_motor->Update();
             right_motor->Update();
             drop_servo->Update();
-            // connected &= rover_compass->CheckConnection();
-            // connected &= rover_gps->CheckConnection();
-            // connected &= ppm_rc->CheckConnection();
-            // connected &= rover_compass->CheckConnection();
-            // connected = true;
             chThdSleepMilliseconds(timing::SLOW_TASK_MS);
         }
     }
@@ -90,9 +84,9 @@ void setup()
 {
     Serial.begin(115200);
 
-    // rover_compass = new compass::BNO055Compass("bno055");
-    rover_gps = new gps::AdafruitUltimateGPS("gps");
-    // ppm_rc        = new rc::PPMReceiver("ppm rc receiver");
+    rover_compass = new compass::BNO055Compass("bno055");
+    rover_gps     = new gps::AdafruitUltimateGPS("gps");
+    ppm_rc        = new rc::PPMReceiver("ppm rc receiver");
 
     rover_controller = new controller::RoverController();
     left_motor       = new motor::DCMotor("left_motor", motor::MotorMapping::LEFT_MOTOR);
@@ -101,16 +95,18 @@ void setup()
 
     Serial.println("=============== AUVSI Rover ======================");
 
-    rover_gps->Attach();
     rover_compass->Attach();
+    // rover_gps->Attach();
     ppm_rc->Attach();
+    left_motor->Attach();
+    right_motor->Attach();
     drop_servo->Attach();
 
     connected = true;
     // calibration procedure
 
-    rover_compass->Calibrate();
-    rover_gps->Calibrate();
+    // rover_compass->Calibrate();
+    // rover_gps->Calibrate();
 
 
     pinMode(LED_BUILTIN, OUTPUT);
@@ -122,44 +118,14 @@ void setup()
     }
 }
 
-uint32_t gpsTimer = millis();
+
 
 void loop()
 {
+    chThdSleepMilliseconds(500);
     if (connected)
     {
-        switch (ppm_rc->ReadRCSwitchMode())
-        {
-            case rc::RCSwitchMode::MANUAL:
-            {
-                auto rc_result = controller::RoverController::RCController(
-                    ppm_rc->ReadThrottle(), ppm_rc->ReadYaw());
-                auto motor_result = controller::RoverController::MotorController(
-                    rc_result.first, rc_result.second);
-                left_motor->ChangeInput(motor_result.first);
-                right_motor->ChangeInput(motor_result.second);
-
-                break;
-            }
-            case rc::RCSwitchMode::AUTO:
-            {
-                break;
-            }
-
-            case rc::RCSwitchMode::TERMINATE:
-            {
-            }
-            default:
-                break;
-        }
-
-        rover_gps->Read();
-
-        if (millis() - gpsTimer > 1000)
-        {
-            gpsTimer = millis();
-
-            rover_gps->Update();
-        }
+        rover_compass->Debug();
+        // rover_gps->Debug();
     }
 }
