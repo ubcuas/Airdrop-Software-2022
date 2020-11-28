@@ -20,9 +20,11 @@ namespace sensor
         void BNO055Compass::Attach()
         {
             imu = Adafruit_BNO055(55, 0x28);
-            while (!imu.begin())
+            if (!imu.begin())
             {
-                Serial.println(" Connecting");
+                Serial.print("No BNO055 detected");
+                while (1)
+                    ;
             }
             imu.setExtCrystalUse(true);
             current_heading = 0;
@@ -35,7 +37,7 @@ namespace sensor
             mag = imu.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
 
             imu::Vector<3> euler = imu.getVector(Adafruit_BNO055::VECTOR_EULER);
-            
+
             current_heading = euler.x();
         }
 
@@ -59,7 +61,7 @@ namespace sensor
             Serial.println("Compass =================");
             Serial.print(this->sensor_name);
             Serial.println(" Debug");
-            Serial.printf("Current heading: %f", current_heading);
+            Serial.printf("Current heading: %f\n", current_heading);
             Serial.println("=================");
         }
 
