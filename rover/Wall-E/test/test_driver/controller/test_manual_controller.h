@@ -15,5 +15,29 @@ namespace test
          * 
          */
         void TestStop();
+
+          /**
+         * @brief Test straight forward output
+         * 
+         */
+        void TestForward();
+
+         /**
+         * @brief Test left turn
+         * 
+         */
+        void TestLeft();
+
+         /**
+         * @brief Test right turn
+         * 
+         */
+        void TestRight();
+
+        /**
+         * @brief Test return for value given that's out of bounds
+         * 
+         */
+        void TestOutOfBounds();
     };
 }  // namespace test
