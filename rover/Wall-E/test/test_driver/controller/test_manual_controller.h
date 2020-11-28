@@ -39,5 +39,10 @@ namespace test
          * 
          */
         void TestOutOfBounds();
+
+        /**
+         * @brief Test RC Controller output
+         * 
+         */
     };
 }  // namespace test

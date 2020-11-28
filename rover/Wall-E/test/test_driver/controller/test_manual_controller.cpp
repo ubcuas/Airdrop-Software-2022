@@ -25,20 +25,20 @@ namespace test
     void TestManualController::TestLeft()
     {
         auto result = controller::RoverController::MotorController(50, -90);
-        TEST_ASSERT_EQUAL(result.first, 0);
-        TEST_ASSERT_EQUAL(result.second, 0);
+        TEST_ASSERT_EQUAL(result.first, -75);
+        TEST_ASSERT_EQUAL(result.second, 75);
     }
 
     void TestManualController::TestRight()
     {
-        auto result = controller::RoverController::MotorController(5, 90);
-        TEST_ASSERT_EQUAL(result.first, 0);
-        TEST_ASSERT_EQUAL(result.second, 0);
+        auto result = controller::RoverController::MotorController(50, 90);
+        TEST_ASSERT_EQUAL(result.first, 75);
+        TEST_ASSERT_EQUAL(result.second, -75);
     }
 
      void TestManualController::TestOutOfBounds()
     {
-        auto result = controller::RoverController::MotorController(5, 360);
+        auto result = controller::RoverController::MotorController(50, 360);
         TEST_ASSERT_EQUAL(result.first, 0);
         TEST_ASSERT_EQUAL(result.second, 0);
     }
