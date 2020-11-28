@@ -96,6 +96,25 @@ namespace sensor
             return degrees(a2);
         }
 
+        std::pair<double, double> GPSCoordinate::GetIntermediatePoint(GPSCoordinate src,
+                                                                      GPSCoordinate dest,
+                                                                      double distance)
+        {
+            double f = distance / GPSCoordinate::DistanceBetween(
+                                      src.GetLatitude(), src.GetLongitude(),
+                                      dest.GetLatitude(), dest.GetLongitude());
+            double delta = distance / 6372795;  // m
+            double a     = sin((1 - f) * delta) / sin(delta);
+            double b     = sin(f * delta) / sin(delta);
+            double x     = a * cos(src.GetLatitude()) * cos(src.GetLongitude()) +
+                       b * cos(dest.GetLatitude()) * cos(dest.GetLongitude());
+            double y = a * cos(src.GetLatitude()) * sin(src.GetLongitude()) +
+                       b * cos(dest.GetLatitude()) * sin(dest.GetLongitude());
+            double z        = a * cos(src.GetLatitude()) + b * cos(dest.GetLatitude());
+            double theta_i  = atan2(z, sqrt(pow(x, 2) + pow(y, 2)));
+            double lambda_i = atan2(y, x);
+            return std::make_pair(theta_i, lambda_i);
+        }
         std::pair<double, double> GPSCoordinate::ConvertToPair() const
         {
             return std::make_pair(GPSCoordinate::GetLatitude(),

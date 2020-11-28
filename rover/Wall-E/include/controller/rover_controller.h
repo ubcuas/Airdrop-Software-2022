@@ -1,6 +1,9 @@
 #pragma once
+#include <constants.h>
 #include <sensor/gps_coordinate.h>
 
+#include <queue>
+#include <list>
 #include <tuple>
 
 namespace controller
@@ -8,8 +11,24 @@ namespace controller
     class RoverController
     {
        private:
+        bool final_arrived;
+        bool waypoints_created;
+        bool landing_status;
+        std::list<bool> landing_status_state;
+
+        sensor::gps::GPSCoordinate FINAL_WAYPOINT = sensor::gps::GPSCoordinate(
+            estimation::DEFAULT_FINAL_LATITUDE, estimation::DEFAULT_FINAL_LONGITUDE);
+
+        std::queue<sensor::gps::GPSCoordinate> intermediate_waypoints;
+
+        double distance_threshold;
+
        public:
         RoverController();
+
+        bool FinalArrived() const;
+        void CreateWaypoint(std::pair<double, double> src);
+        std::pair<double, double> UpdateWaypoint(std::pair<double, double> src);
 
         /**
          * @brief Processes the passed speed and angle and returns the values passed to
@@ -51,7 +70,7 @@ namespace controller
          */
         void LandingDetectionUpdate();
 
-        bool GetLandingStatus();
+        bool GetLandingStatus() const;
 
         /**
          * Calculates the necessary turn angle / heading difference between the target

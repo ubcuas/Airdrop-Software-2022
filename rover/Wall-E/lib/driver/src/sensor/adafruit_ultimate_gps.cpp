@@ -85,7 +85,7 @@ namespace sensor
             return true;
         }
 
-        void AdafruitUltimateGPS::WaitForGPSConnection() {}
+        bool AdafruitUltimateGPS::WaitForGPSConnection() {}
 
         std::pair<double, double> AdafruitUltimateGPS::GetCurrentGPSCoordinate() const
         {

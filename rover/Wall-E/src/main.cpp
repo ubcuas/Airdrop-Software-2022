@@ -6,7 +6,6 @@
 #include <sensor/adafruit_ultimate_gps.h>
 #include <sensor/bno055.h>
 #include <sensor/ppm_receiver.h>
-#include <queue>
 
 #include "controller/rover_controller.h"
 
@@ -20,8 +19,7 @@ motor::DCMotor* left_motor;
 motor::DCMotor* right_motor;
 servo::Servo* drop_servo;
 controller::RoverController* rover_controller;
-std::queue<sensor::gps::GPSCoordinate> intermediate_waypoints;
-sensor::gps::GPSCoordinate final_waypoint(estimation::DEFAULT_FINAL_LATITUDE, estimation::DEFAULT_FINAL_LONGITUDE);
+
 
 bool connected = true;
 bool led_state = false;
@@ -53,7 +51,6 @@ static THD_FUNCTION(Thread1, arg)
         if (connected)
         {
             // rover_gps->Update();
-            rover_compass->Update();
             chThdSleepMilliseconds(timing::ESTIMATION_TASK_MS);
         }
     }
@@ -68,6 +65,7 @@ static THD_FUNCTION(Thread2, arg)
     {
         if (connected)
         {
+            rover_compass->Update();
             // TODO: figure out motor update frequency
             left_motor->Update();
             right_motor->Update();
@@ -106,7 +104,6 @@ void setup()
     right_motor->Attach();
     drop_servo->Attach();
 
-    intermediate_waypoints.push(sensor::gps::GPSCoordinate(estimation::DEFAULT_FINAL_LATITUDE, estimation::DEFAULT_FINAL_LONGITUDE));
 
     connected = true;
     // calibration procedure
@@ -124,15 +121,12 @@ void setup()
     }
 }
 
-bool has_landed {false};
-bool final_arrived {false};
-bool to_final_waypoint {intermediate_waypoints.size() == 0};
-sensor::gps::GPSCoordinate next_waypoint{(intermediate_waypoints.size() > 0) ? intermediate_waypoints.front() : final_waypoint};
+
 uint32_t gpsTimer = millis();
 
 void loop()
 {
-    chThdSleepMilliseconds(500);
+    chThdSleepMilliseconds(250);
     if (connected)
     {
         switch (ppm_rc->ReadRCSwitchMode())
@@ -150,48 +144,40 @@ void loop()
             }
             case rc::RCSwitchMode::AUTO:
             {
-                if (!has_landed) {
+                if (!rover_controller->GetLandingStatus())
+                {
                     rover_controller->LandingDetectionUpdate();
-                    has_landed = rover_controller->GetLandingStatus();
-                } else {
-                    if (!final_arrived)
+                    break;
+                }
+                else
+                {
+                    if (!rover_gps->WaitForGPSConnection())
                     {
-                        auto current_coordinate{rover_gps->GetCurrentGPSCoordinate()};
-                        auto target_coordinate{next_waypoint.ConvertToPair()};
-                        auto auto_result{controller::RoverController::AutoController(current_coordinate, target_coordinate)};
-                        auto motor_result{controller::RoverController::MotorController(auto_result.first, auto_result.second)};
+                        rover_controller->CreateWaypoint(rover_gps->GetCurrentGPSCoordinate());
+                    }
+                    if (!rover_controller->FinalArrived())
+                    {
+                        // TODO: make the rover focus on going straight from waypoint to
+                        // waypoint, instead depend on GPS corrdiante.
+                        // update the current controller
+                        auto current_coordinate = rover_gps->GetCurrentGPSCoordinate();
+                        auto target_coordinate =
+                            rover_controller->UpdateWaypoint(current_coordinate);
+                        auto auto_result = controller::RoverController::AutoController(
+                            current_coordinate, target_coordinate);
+                        auto motor_result = controller::RoverController::MotorController(
+                            auto_result.first, auto_result.second);
                         left_motor->ChangeInput(motor_result.first);
                         right_motor->ChangeInput(motor_result.second);
-
-                        double distance_threshold{(to_final_waypoint) ? estimation::FINAL_WAYPOINT_THRESHOLD : estimation::INTERMEDIATE_WAYPOINT_THRESHOLD};
-                        if (controller::RoverController::ReachedWaypoint(current_coordinate, target_coordinate, distance_threshold))
-                        {
-                            if (to_final_waypoint)
-                            {
-                                final_arrived = true;
-                            }
-                            else
-                            {
-                                intermediate_waypoints.pop();
-                                if (intermediate_waypoints.size() > 0)
-                                {
-                                    next_waypoint = intermediate_waypoints.front();
-                                }
-                                else
-                                {
-                                    next_waypoint = final_waypoint;
-                                    to_final_waypoint = true;
-                                }
-                            }
-                            
-                        }
+                        break;
                     }
+                    // if arrived, default to TERMINATE mode.
                 }
-                break;
             }
 
             case rc::RCSwitchMode::TERMINATE:
             {
+                // LPM, disable everything.
             }
             default:
                 break;

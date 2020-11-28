@@ -18,16 +18,19 @@ namespace timing
 
 namespace estimation
 {
-    const static double DEFAULT_GPS_LATITUDE  = 0;
-    const static double DEFAULT_GPS_LONGITUDE = 0;
-    const static double DEFAULT_FINAL_LATITUDE = 0;
-    const static double DEFAULT_FINAL_LONGITUDE = 0;
-    const static double INTERMEDIATE_WAYPOINT_THRESHOLD = 5;
-    const static double FINAL_WAYPOINT_THRESHOLD = 1;
-    const static double MOTOR_TURN_MIN_THRESH = 5;
-    const static double MOTOR_TURN_MAX_THRESH = 100;
-    const static double FULL_POWER            = 100;
-    const static double FULL_ANGLE            = 180;
+    const static double DEFAULT_GPS_LATITUDE            = 0;
+    const static double DEFAULT_GPS_LONGITUDE           = 0;
+    const static double DEFAULT_FINAL_LATITUDE          = 0;
+    const static double DEFAULT_FINAL_LONGITUDE         = 0;
+    const static double INTERMEDIATE_WAYPOINT_THRESHOLD = 5;  // m
+    const static double FINAL_WAYPOINT_THRESHOLD        = 1;  // m
+    const static int WAYPOINT_NUMBER                    = 10;
+
+
+    const static double MOTOR_TURN_MIN_THRESH = 5;    // degree
+    const static double MOTOR_TURN_MAX_THRESH = 100;  // degree
+    const static double FULL_POWER            = 100;  // percent
+    const static double FULL_ANGLE            = 180;  // degree
 }  // namespace estimation
 
 namespace magic
