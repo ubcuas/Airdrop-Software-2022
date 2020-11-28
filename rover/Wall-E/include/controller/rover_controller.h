@@ -1,6 +1,6 @@
 #pragma once
 #include <tuple>
-#include "sensor/gps_coordinate.h"
+#include <sensor/gps_coordinate.h>
 
 namespace controller
 {

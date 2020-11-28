@@ -18,6 +18,30 @@ namespace controller
 
         return std::make_pair(throttle, turn_angle);
     }
+    double RoverController::HeadingController(std::pair<double, double> src, std::pair<double, double> dest)
+    {
+        double turn_angle = sensor::gps::GPSCoordinate::CourseTo(src.first, src.second, dest.first, dest.second);
+        while (turn_angle > 180)
+        {
+            turn_angle -= 360;
+        }
+        while (turn_angle < -180) 
+        {
+            turn_angle += 360;
+        }
+        return turn_angle;
+    }
+
+    void RoverController::LandingDetectionUpdate()
+    {
+
+    }
+            
+    bool RoverController::GetLandingStatus()
+    {
+        return true;
+    }
+
     bool RoverController::ReachedWaypoint(std::pair<double, double> src, std::pair<double, double> dest, double distance_threshold)
     {
         return sensor::gps::GPSCoordinate::DistanceBetween(src.first, src.second, dest.first, dest.second) <= distance_threshold;

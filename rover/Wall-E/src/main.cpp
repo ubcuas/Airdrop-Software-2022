@@ -20,9 +20,7 @@ motor::DCMotor* left_motor;
 motor::DCMotor* right_motor;
 servo::Servo* drop_servo;
 controller::RoverController* rover_controller;
-std::queue<sensor::gps::GPSCoordinate> intermediate_waypoints{
-    new sensor::gps::GPSCoordinate(estimation::DEFAULT_FINAL_LATITUDE, estimation::DEFAULT_FINAL_LONGITUDE)
-};
+std::queue<sensor::gps::GPSCoordinate> intermediate_waypoints;
 sensor::gps::GPSCoordinate final_waypoint(estimation::DEFAULT_FINAL_LATITUDE, estimation::DEFAULT_FINAL_LONGITUDE);
 
 bool connected = true;
@@ -112,6 +110,8 @@ void setup()
     ppm_rc->Attach();
     drop_servo->Attach();
 
+    intermediate_waypoints.push(sensor::gps::GPSCoordinate(estimation::DEFAULT_FINAL_LATITUDE, estimation::DEFAULT_FINAL_LONGITUDE));
+
     connected = true;
     // calibration procedure
 
@@ -129,9 +129,9 @@ void setup()
 }
 
 bool has_landed {false};
-bool final_arrive {false};
-bool to_final_waypoint {intermediate_waypoints.size == 0};
-sensor::gps::GPSCoordinate* next_waypoint{(intermediate_waypoints.size > 0) ? intermediate_waypoints.front() : final_waypoint};
+bool final_arrived {false};
+bool to_final_waypoint {intermediate_waypoints.size() == 0};
+sensor::gps::GPSCoordinate next_waypoint{(intermediate_waypoints.size() > 0) ? intermediate_waypoints.front() : final_waypoint};
 uint32_t gpsTimer = millis();
 
 void loop()
@@ -171,7 +171,7 @@ void loop()
                         {
                             if (to_final_waypoint)
                             {
-                                final_arrive = true;
+                                final_arrived = true;
                             }
                             else
                             {
