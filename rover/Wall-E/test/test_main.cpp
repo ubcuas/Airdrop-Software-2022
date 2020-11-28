@@ -51,7 +51,6 @@ void setup()
     RUN_TEST(test_controller_driver_right);
     RUN_TEST(test_controller_driver_out_of_bound);
     RUN_TEST(test_controller_driver_backward);
-
     // example blink
     RUN_TEST(test_led_builtin_pin_number);
 
