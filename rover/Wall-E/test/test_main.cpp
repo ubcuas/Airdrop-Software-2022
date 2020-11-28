@@ -2,10 +2,7 @@
 #include <pin_assignment.h>
 #include <sensor/sensor.h>
 #include <unity.h>
-
-#include "test_driver/sensor/test_gps.h"
-#include "test_driver/test_sensor_driver.h"
-#include "test_driver/controller/test_manual_controller.h"
+#include "test.h"
 
 // void setUp(void) {
 // // set stuff up here
@@ -14,6 +11,7 @@
 // void tearDown(void) {
 // // clean stuff up here
 // }
+
 
 void test_led_builtin_pin_number(void)
 {
@@ -32,22 +30,7 @@ void test_led_state_low(void)
     TEST_ASSERT_EQUAL(LOW, digitalRead(LED_BUILTIN));
 }
 
-// Add your tests here
 
-void test_sensor_driver()
-{
-    test::TestSensorDriver test = test::TestSensorDriver();
-    TEST_ASSERT_EQUAL(255, pin::TEST_DUMMPY);
-    test.TestGPS();
-    test.TestCompass();
-    test.TestMotor();
-    test.TestRC();
-}
-
-void test_gps_driver()
-{
-    test::TestGPS gps = test::TestGPS();
-}
 
 
 void setup()
@@ -62,6 +45,11 @@ void setup()
 
     RUN_TEST(test_sensor_driver);
 
+    RUN_TEST(test_controller_driver_forward);
+    RUN_TEST(test_controller_driver_stop);
+    RUN_TEST(test_controller_driver_left);
+    RUN_TEST(test_controller_driver_right);
+    RUN_TEST(test_controller_driver_out_of_bound);
 
     // example blink
     RUN_TEST(test_led_builtin_pin_number);

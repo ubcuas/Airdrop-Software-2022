@@ -1,3 +1,5 @@
+#ifndef UNIT_TEST
+
 #include <Arduino.h>
 #include <ChRt.h>
 #include <actuator/dc_motor.h>
@@ -163,3 +165,5 @@ void loop()
         }
     }
 }
+
+#endif
