@@ -49,6 +49,7 @@ static THD_FUNCTION(Thread1, arg)
         if (connected)
         {
             rover_gps->Update();
+            rover_compass->Update();
             chThdSleepMilliseconds(timing::ESTIMATION_TASK_MS);
         }
     }
@@ -91,7 +92,7 @@ void setup()
     Serial.begin(115200);
 
     // rover_compass = new compass::BNO055Compass("bno055");
-    rover_gps = new gps::AdafruitUltimateGPS("gps");
+    rover_gps     = new gps::AdafruitUltimateGPS("gps");
     // ppm_rc        = new rc::PPMReceiver("ppm rc receiver");
 
     rover_controller = new controller::RoverController();
@@ -102,15 +103,17 @@ void setup()
     Serial.println("=============== AUVSI Rover ======================");
 
     rover_gps->Attach();
-    rover_compass->Attach();
-    ppm_rc->Attach();
+    // rover_compass->Attach();
+    // ppm_rc->Attach();
+    left_motor->Attach();
+    right_motor->Attach();
     drop_servo->Attach();
 
     connected = true;
     // calibration procedure
 
-    rover_compass->Calibrate();
-    rover_gps->Calibrate();
+    // rover_compass->Calibrate();
+    // rover_gps->Calibrate();
 
 
     pinMode(LED_BUILTIN, OUTPUT);
@@ -128,6 +131,7 @@ void loop()
 {
     if (connected)
     {
+        Serial.println(rover_compass->GetHeading());
         switch (ppm_rc->ReadRCSwitchMode())
         {
             case rc::RCSwitchMode::MANUAL:

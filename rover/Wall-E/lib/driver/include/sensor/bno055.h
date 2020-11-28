@@ -1,9 +1,8 @@
 #pragma once
 
-#include <sensor/sensor.h>
-#include <Wire.h>
-#include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
+#include <Adafruit_Sensor.h>
+#include <sensor/sensor.h>
 #include <utility/imumaths.h>
 namespace sensor
 {
@@ -12,17 +11,17 @@ namespace sensor
         class BNO055Compass : public Sensor
         {
            private:
-            Adafruit_BNO055 imu = Adafruit_BNO055();
-            int current_heading;
+            Adafruit_BNO055 imu;
+            double current_heading;
             imu::Vector<3> acc;
             imu::Vector<3> gyr;
             imu::Vector<3> mag;
 
            public:
-            BNO055Compass(String sensor_name);
-
+            using Sensor::Sensor;
+            
             virtual bool CheckConnection() override;
-
+            
             virtual void Attach() override;
 
             virtual void Update() override;
@@ -31,7 +30,7 @@ namespace sensor
 
             virtual void Debug() override;
 
-            int getHeading();
+            double GetHeading() const;
         };
     }  // namespace compass
 

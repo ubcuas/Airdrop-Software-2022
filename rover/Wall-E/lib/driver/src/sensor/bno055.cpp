@@ -1,24 +1,14 @@
-#include <sensor/bno055.h>
-#include <pin_assignment.h>
 #include <Wire.h>
+#include <pin_assignment.h>
+#include <sensor/bno055.h>
 
 namespace sensor
 {
     namespace compass
     {
-
-        BNO055Compass::BNO055Compass(String sensor_name)
-        : Sensor::Sensor(sensor_name)
-        {
-            imu.setExtCrystalUse(true);
-            current_heading = 0;
-        }
-
         bool BNO055Compass::CheckConnection()
         {
-            Serial.print(this->sensor_name);
-            Serial.println(" Checking Connection");
-            if(imu.begin())
+            if (imu.begin())
             {
                 Serial.println(" Connected!");
                 return true;
@@ -29,12 +19,13 @@ namespace sensor
 
         void BNO055Compass::Attach()
         {
-            Wire.setSCL(pin::BNO055_SCL); 
-            Wire.setSDA(pin::BNO055_SDA); 
-            Wire.beginTransmission(0x28);
-            imu.begin();
-            Serial.print(this->sensor_name);
-            Serial.println(" Attach");
+            imu = Adafruit_BNO055(55, 0x28);
+            while (!imu.begin())
+            {
+                Serial.println(" Connecting");
+            }
+            imu.setExtCrystalUse(true);
+            current_heading = 0;
         }
 
         void BNO055Compass::Update()
@@ -43,9 +34,9 @@ namespace sensor
             gyr = imu.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
             mag = imu.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
 
-            current_heading = atan2(mag.y(),mag.x());
-            Serial.print(this->sensor_name);
-            Serial.println(" Update");
+            imu::Vector<3> euler = imu.getVector(Adafruit_BNO055::VECTOR_EULER);
+            
+            current_heading = euler.x();
         }
 
         bool BNO055Compass::Calibrate()
@@ -55,7 +46,7 @@ namespace sensor
 
             Serial.print(this->sensor_name);
             Serial.println(" Calibrate");
-            if((system == 0)||(gyro == 0)||(accel==0)||(mg==0))
+            if ((system == 0) || (gyro == 0) || (accel == 0) || (mg == 0))
             {
                 return false;
             }
@@ -65,14 +56,15 @@ namespace sensor
 
         void BNO055Compass::Debug()
         {
+            Serial.println("Compass =================");
             Serial.print(this->sensor_name);
             Serial.println(" Debug");
+            Serial.printf("Current heading: %f", current_heading);
+            Serial.println("=================");
         }
 
-        int BNO055Compass::getHeading()
+        double BNO055Compass::GetHeading() const
         {
-            Serial.print(this->sensor_name);
-            Serial.println(" Get Heading");
             return current_heading;
         }
 
