@@ -42,4 +42,12 @@ namespace test
         TEST_ASSERT_EQUAL(result.first, 0);
         TEST_ASSERT_EQUAL(result.second, 0);
     }
+
+    void TestManualController::TestBackwards()
+    {
+        auto result = controller::RoverController::MotorController(-50, 0);
+        TEST_ASSERT_EQUAL(result.first, 0);
+        TEST_ASSERT_EQUAL(result.second, 0);
+    }
+
 }  // namespace test

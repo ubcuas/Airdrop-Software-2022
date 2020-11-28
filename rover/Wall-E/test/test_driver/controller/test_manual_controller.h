@@ -44,5 +44,19 @@ namespace test
          * @brief Test RC Controller output
          * 
          */
+        void TestRCController_1();
+
+        /**
+         * @brief Test RC Controller output
+         * 
+         */
+        void TestRCController_2();
+
+        /**
+         * @brief Test backwards, rover should not be able to go backwards
+         * 
+         */
+         void TestBackwards();
+
     };
 }  // namespace test
