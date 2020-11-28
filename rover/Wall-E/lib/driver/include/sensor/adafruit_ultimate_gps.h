@@ -3,6 +3,7 @@
 #include <sensor/gps_coordinate.h>
 #include <sensor/sensor.h>
 #include <tuple>
+#include <Adafruit_GPS.h>
 
 namespace sensor
 {
@@ -13,7 +14,7 @@ namespace sensor
            private:
             GPSCoordinate* current_location;
             GPSCoordinate* last_location;
-
+            Adafruit_GPS* GPS;
            public:
             using Sensor::Sensor;
 
