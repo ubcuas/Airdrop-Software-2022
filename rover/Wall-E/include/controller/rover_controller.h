@@ -4,8 +4,11 @@
 
 namespace controller
 {
-    class RoverController{
-        private:
+    class RoverController
+    {
+       private:
+       public:
+        RoverController();
 
         public:
             RoverController();
@@ -64,4 +67,4 @@ namespace controller
             static bool ReachedWaypoint(std::pair<double, double> src, std::pair<double, double> dest, double distance_threshold);
 
     };
-} // namespace controller
+}  // namespace controller

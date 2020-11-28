@@ -5,6 +5,8 @@
 
 #include "test_driver/sensor/test_gps.h"
 #include "test_driver/test_sensor_driver.h"
+#include "test_driver/controller/test_manual_controller.h"
+
 // void setUp(void) {
 // // set stuff up here
 // }
