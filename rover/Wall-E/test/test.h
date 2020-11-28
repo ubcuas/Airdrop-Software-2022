@@ -48,3 +48,8 @@ void test_controller_driver_stop()
 {
     contrl.TestStop();
 }
+
+void test_controller_driver_backward()
+{
+    contrl.TestBackwards();
+}
