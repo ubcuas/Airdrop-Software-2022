@@ -21,15 +21,8 @@ namespace controller
     double RoverController::HeadingController(std::pair<double, double> src, std::pair<double, double> dest)
     {
         double turn_angle = sensor::gps::GPSCoordinate::CourseTo(src.first, src.second, dest.first, dest.second);
-        while (turn_angle > 180)
-        {
-            turn_angle -= 360;
-        }
-        while (turn_angle < -180) 
-        {
-            turn_angle += 360;
-        }
-        return turn_angle;
+
+        return (turn_angle - 180);
     }
 
     void RoverController::LandingDetectionUpdate()
