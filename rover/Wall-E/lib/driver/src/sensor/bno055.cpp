@@ -8,7 +8,7 @@ namespace sensor
     {
         bool BNO055Compass::CheckConnection()
         {
-            if (imu.begin())
+            if (bno055.begin())
             {
                 Serial.println(" Connected!");
                 return true;
@@ -19,24 +19,24 @@ namespace sensor
 
         void BNO055Compass::Attach()
         {
-            imu = Adafruit_BNO055(55, 0x28);
-            if (!imu.begin())
+            bno055 = Adafruit_BNO055(55, 0x28);
+            if (!bno055.begin())
             {
                 Serial.print("No BNO055 detected");
                 while (1)
                     ;
             }
-            imu.setExtCrystalUse(true);
+            bno055.setExtCrystalUse(true);
             current_heading = 0;
         }
 
         void BNO055Compass::Update()
         {
-            acc = imu.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
-            gyr = imu.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
-            mag = imu.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
+            acc = bno055.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
+            gyr = bno055.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
+            mag = bno055.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
 
-            imu::Vector<3> euler = imu.getVector(Adafruit_BNO055::VECTOR_EULER);
+            imu::Vector<3> euler = bno055.getVector(Adafruit_BNO055::VECTOR_EULER);
 
             current_heading = euler.x();
         }
@@ -44,7 +44,7 @@ namespace sensor
         bool BNO055Compass::Calibrate()
         {
             uint8_t system, gyro, accel, mg = 0;
-            imu.getCalibration(&system, &gyro, &accel, &mg);
+            bno055.getCalibration(&system, &gyro, &accel, &mg);
 
             Serial.print(this->sensor_name);
             Serial.println(" Calibrate");
@@ -68,6 +68,13 @@ namespace sensor
         double BNO055Compass::GetHeading() const
         {
             return current_heading;
+        }
+
+        std::tuple<double, double, double> BNO055Compass::GetAccelVector()
+        {
+            imu::Vector<3> accel = bno055.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
+
+            return std::make_tuple(accel[0], accel[1], accel[2]);
         }
 
 
