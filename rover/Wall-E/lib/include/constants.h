@@ -4,8 +4,7 @@
 namespace timing
 {
     const static int ESTIMATION_TASK_MS = 250;
-
-    const static int FAST_TASK_MS = 10;
+    const static int FAST_TASK_MS       = 10;
 
     const static int SLOW_TASK_MS = 100;
 
@@ -26,6 +25,7 @@ namespace estimation
     const static double FINAL_WAYPOINT_THRESHOLD        = 1;  // m
     const static int WAYPOINT_NUMBER                    = 10;
     const static int LANDING_DETECTION_HISTORY_LENGTH   = 100;
+    const static double DELTA_HEIGHT_THRESHOLD          = 30;
     const static double LANDING_ACCEL_THRESH            = 0.1;
     const static double LANDING_STATUS_CONFIRM_THRESH   = 0.8;  // percent
     const static double MOTOR_TURN_MIN_THRESH           = 5;    // degree
