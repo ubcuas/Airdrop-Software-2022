@@ -1,9 +1,10 @@
 #pragma once
+#include <Adafruit_BNO055.h>
 #include <constants.h>
 #include <sensor/gps_coordinate.h>
 
+#include <deque>
 #include <queue>
-#include <list>
 #include <tuple>
 
 namespace controller
@@ -13,8 +14,9 @@ namespace controller
        private:
         bool final_arrived;
         bool waypoints_created;
-        bool landing_status;
-        std::list<bool> landing_status_state;
+        bool landed;
+        imu::Vector<3> average;
+        std::deque<bool> landing_status_state;
 
         sensor::gps::GPSCoordinate FINAL_WAYPOINT = sensor::gps::GPSCoordinate(
             estimation::DEFAULT_FINAL_LATITUDE, estimation::DEFAULT_FINAL_LONGITUDE);
@@ -22,6 +24,8 @@ namespace controller
         std::queue<sensor::gps::GPSCoordinate> intermediate_waypoints;
 
         double distance_threshold;
+
+        bool WithinLimit(double src, double val, double limit) const;
 
        public:
         RoverController();
@@ -68,7 +72,7 @@ namespace controller
          * @todo complete function signature.
          *
          */
-        void LandingDetectionUpdate();
+        void LandingDetectionUpdate(double accelx, double accely, double accelz);
 
         bool GetLandingStatus() const;
 

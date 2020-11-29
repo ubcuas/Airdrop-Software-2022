@@ -7,6 +7,8 @@
 #include <sensor/bno055.h>
 #include <sensor/ppm_receiver.h>
 
+#include <tuple>
+
 #include "controller/rover_controller.h"
 
 
@@ -146,14 +148,17 @@ void loop()
             {
                 if (!rover_controller->GetLandingStatus())
                 {
-                    rover_controller->LandingDetectionUpdate();
+                    double accelx, accely, accelz;
+                    std::tie(accelx, accely, accelz) = rover_compass->GetAccelVector();
+                    rover_controller->LandingDetectionUpdate(accelx, accely, accelz);
                     break;
                 }
                 else
                 {
                     if (!rover_gps->WaitForGPSConnection())
                     {
-                        rover_controller->CreateWaypoint(rover_gps->GetCurrentGPSCoordinate());
+                        rover_controller->CreateWaypoint(
+                            rover_gps->GetCurrentGPSCoordinate());
                     }
                     if (!rover_controller->FinalArrived())
                     {
