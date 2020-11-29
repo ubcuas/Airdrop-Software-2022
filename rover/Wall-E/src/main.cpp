@@ -7,7 +7,10 @@
 #include <sensor/bno055.h>
 #include <sensor/ppm_receiver.h>
 
+#include <tuple>
+
 #include "controller/rover_controller.h"
+
 
 using namespace sensor;
 using namespace actuator;
@@ -18,6 +21,7 @@ motor::DCMotor* left_motor;
 motor::DCMotor* right_motor;
 servo::Servo* drop_servo;
 controller::RoverController* rover_controller;
+
 
 bool connected = true;
 bool led_state = false;
@@ -49,7 +53,6 @@ static THD_FUNCTION(Thread1, arg)
         if (connected)
         {
             // rover_gps->Update();
-            rover_compass->Update();
             chThdSleepMilliseconds(timing::ESTIMATION_TASK_MS);
         }
     }
@@ -64,6 +67,7 @@ static THD_FUNCTION(Thread2, arg)
     {
         if (connected)
         {
+            rover_compass->Update();
             // TODO: figure out motor update frequency
             left_motor->Update();
             right_motor->Update();
@@ -102,6 +106,7 @@ void setup()
     right_motor->Attach();
     drop_servo->Attach();
 
+
     connected = true;
     // calibration procedure
 
@@ -119,13 +124,77 @@ void setup()
 }
 
 
+uint32_t gpsTimer = millis();
 
 void loop()
 {
-    chThdSleepMilliseconds(500);
+    chThdSleepMilliseconds(250);
     if (connected)
     {
-        rover_compass->Debug();
-        // rover_gps->Debug();
+        switch (ppm_rc->ReadRCSwitchMode())
+        {
+            case rc::RCSwitchMode::MANUAL:
+            {
+                auto rc_result = controller::RoverController::RCController(
+                    ppm_rc->ReadThrottle(), ppm_rc->ReadYaw());
+                auto motor_result = controller::RoverController::MotorController(
+                    rc_result.first, rc_result.second);
+                left_motor->ChangeInput(motor_result.first);
+                right_motor->ChangeInput(motor_result.second);
+
+                break;
+            }
+            case rc::RCSwitchMode::AUTO:
+            {
+                if (!rover_controller->GetLandingStatus())
+                {
+                    double accelx, accely, accelz;
+                    std::tie(accelx, accely, accelz) = rover_compass->GetAccelVector();
+                    rover_controller->LandingDetectionUpdate(accelx, accely, accelz);
+                    break;
+                }
+                else
+                {
+                    if (!rover_gps->WaitForGPSConnection())
+                    {
+                        rover_controller->CreateWaypoint(
+                            rover_gps->GetCurrentGPSCoordinate());
+                    }
+                    if (!rover_controller->FinalArrived())
+                    {
+                        // TODO: make the rover focus on going straight from waypoint to
+                        // waypoint, instead depend on GPS corrdiante.
+                        // update the current controller
+                        auto current_coordinate = rover_gps->GetCurrentGPSCoordinate();
+                        auto target_coordinate =
+                            rover_controller->UpdateWaypoint(current_coordinate);
+                        auto auto_result = controller::RoverController::AutoController(
+                            current_coordinate, target_coordinate);
+                        auto motor_result = controller::RoverController::MotorController(
+                            auto_result.first, auto_result.second);
+                        left_motor->ChangeInput(motor_result.first);
+                        right_motor->ChangeInput(motor_result.second);
+                        break;
+                    }
+                    // if arrived, default to TERMINATE mode.
+                }
+            }
+
+            case rc::RCSwitchMode::TERMINATE:
+            {
+                // LPM, disable everything.
+            }
+            default:
+                break;
+        }
+
+        rover_gps->Read();
+
+        if (millis() - gpsTimer > 1000)
+        {
+            gpsTimer = millis();
+
+            rover_gps->Update();
+        }
     }
 }
