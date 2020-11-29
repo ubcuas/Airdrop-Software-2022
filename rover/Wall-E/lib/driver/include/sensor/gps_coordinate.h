@@ -30,6 +30,17 @@ namespace sensor
             static double GetHeadingBetween(GPSCoordinate src, GPSCoordinate dest);
             static double DistanceBetween(double lat1, double long1, double lat2, double long2);
             static double CourseTo(double lat1, double long1, double lat2, double long2);
+
+            /**
+             * @brief Get the Intermediate Point object
+             *  http://www.movable-type.co.uk/scripts/latlong.html
+             * @param src 
+             * @param dest 
+             * @param distance 
+             * @return double 
+             */
+            static std::pair<double, double> GetIntermediatePoint(GPSCoordinate src, GPSCoordinate dest, double distance);
+            std::pair<double, double> ConvertToPair() const;
         };
     }  // namespace gps
 

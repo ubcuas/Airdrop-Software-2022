@@ -8,11 +8,11 @@ namespace sensor
 {
     namespace gps
     {
-        #ifndef ARDUINO
-                SoftwareSerial mySerial(pin::GPS_TX_PIN, pin::GPS_RX_PIN);  // arduino
-        #else
-        #define mySerial Serial1  // teensy
-        #endif
+#ifndef ARDUINO
+        SoftwareSerial mySerial(pin::GPS_TX_PIN, pin::GPS_RX_PIN);  // arduino
+#else
+#define mySerial Serial1  // teensy
+#endif
 
         bool AdafruitUltimateGPS::CheckConnection()
         {
@@ -69,7 +69,7 @@ namespace sensor
 
             if (GPS->newNMEAreceived())
             {
-                Serial.println(GPS->lastNMEA());   // this also sets the
+                Serial.println(GPS->lastNMEA());  // this also sets the
                 // newNMEAreceived() flag to false
 
                 if (!GPS->parse(GPS->lastNMEA()))
@@ -85,7 +85,11 @@ namespace sensor
             return true;
         }
 
-        void AdafruitUltimateGPS::WaitForGPSConnection() {}
+        bool AdafruitUltimateGPS::WaitForGPSConnection()
+        {
+            // TODO: complete this
+            return true;
+        }
 
         std::pair<double, double> AdafruitUltimateGPS::GetCurrentGPSCoordinate() const
         {
