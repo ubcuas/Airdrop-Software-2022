@@ -1,7 +1,9 @@
 #pragma once
 
+#include <Adafruit_GPS.h>
 #include <sensor/gps_coordinate.h>
 #include <sensor/sensor.h>
+
 #include <tuple>
 
 namespace sensor
@@ -13,11 +15,12 @@ namespace sensor
            private:
             GPSCoordinate* current_location;
             GPSCoordinate* last_location;
+            Adafruit_GPS* GPS;
 
            public:
             using Sensor::Sensor;
 
-            void WaitForGPSConnection();
+            bool WaitForGPSConnection();
 
             std::pair<double, double> GetCurrentGPSCoordinate() const;
 
