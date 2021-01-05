@@ -44,7 +44,7 @@ namespace sensor
             uint8_t put_index = 0;
 
            public:
-            BNO055Compass(String sensor_name);
+            using Sensor::Sensor;
 
             virtual bool CheckConnection() override;
 
