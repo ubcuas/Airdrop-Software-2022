@@ -22,9 +22,22 @@ namespace sensor
             imu::Vector<3> mag;
             double ACCEL_VEL_TRANSITION = timing::SLOW_TASK_MS / 1000.0;
             const uint8_t filter_length = 15;
-            const double filter_taps[15] = { 0.02318,0.06551,0.05194,-0.03782,-0.09311,0.04331,
-                                            0.31278,0.45552,0.31278, 0.04331,-0.09311,-0.03782,
-                                            0.05194,0.06551,0.02318};
+            const double filter_taps[15] = {  -0.005071,
+                                              0.011302,
+                                              0.016822,
+                                              -0.029808,
+                                              -0.065989,
+                                              0.051410,
+                                              0.302127,
+                                              0.438786,
+                                              0.302127,
+                                              0.051410,
+                                              -0.065989,
+                                              -0.029808,
+                                              0.016822,
+                                              0.011303,
+                                              -0.005071};
+
             imu::Vector<3> acc_history[15] = {0};
             imu::Vector<3> gyr_history[15] = {0};
             imu::Vector<3> mag_history[15] = {0};
