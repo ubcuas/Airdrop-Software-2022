@@ -4,17 +4,10 @@
 #include <Adafruit_Sensor.h>
 #include <constants.h>
 #include <sensor/sensor.h>
-<<<<<<< HEAD
-#include <Wire.h>
-#include <Adafruit_Sensor.h>
-#include <Adafruit_BNO055.h>
-#include <utility/imumaths.h>
-=======
 #include <utility/imumaths.h>
 
 #include <tuple>
 
->>>>>>> 01a00c663e643e510655256f5849c00e897c803e
 namespace sensor
 {
     namespace compass
@@ -22,20 +15,20 @@ namespace sensor
         class BNO055Compass : public Sensor
         {
            private:
-<<<<<<< HEAD
-            Adafruit_BNO055 imu = Adafruit_BNO055();
-            int current_heading;
-            imu::Vector<3> acc;
-            imu::Vector<3> gyr;
-            imu::Vector<3> mag;
-=======
             Adafruit_BNO055 bno055;
             double current_heading;
             imu::Vector<3> acc;
             imu::Vector<3> gyr;
             imu::Vector<3> mag;
             double ACCEL_VEL_TRANSITION = timing::SLOW_TASK_MS / 1000.0;
->>>>>>> 01a00c663e643e510655256f5849c00e897c803e
+            const uint8_t filter_length = 15;
+            const double filter_taps[15] = { 0.02318,0.06551,0.05194,-0.03782,-0.09311,0.04331,
+                                            0.31278,0.45552,0.31278, 0.04331,-0.09311,-0.03782,
+                                            0.05194,0.06551,0.02318};
+            imu::Vector<3> acc_history[15] = {0};
+            imu::Vector<3> gyr_history[15] = {0};
+            imu::Vector<3> mag_history[15] = {0};
+            uint8_t put_index = 0;
 
            public:
             BNO055Compass(String sensor_name);
@@ -50,13 +43,9 @@ namespace sensor
 
             virtual void Debug() override;
 
-<<<<<<< HEAD
-            int getHeading();
-=======
             double GetHeading() const;
 
             std::tuple<double, double, double> GetAccelVector();
->>>>>>> 01a00c663e643e510655256f5849c00e897c803e
         };
     }  // namespace compass
 

@@ -9,22 +9,11 @@ namespace sensor
     namespace compass
     {
 
-        BNO055Compass::BNO055Compass(String sensor_name)
-        : Sensor::Sensor(sensor_name)
-        {
-            imu.setExtCrystalUse(true);
-            current_heading = 0;
-        }
-
         bool BNO055Compass::CheckConnection()
         {
-<<<<<<< HEAD
             Serial.print(this->sensor_name);
             Serial.println(" Checking Connection");
-            if(imu.begin())
-=======
-            if (bno055.begin())
->>>>>>> 01a00c663e643e510655256f5849c00e897c803e
+            if(bno055.begin())
             {
                 Serial.println(" Connected!");
                 return true;
@@ -35,14 +24,6 @@ namespace sensor
 
         void BNO055Compass::Attach()
         {
-<<<<<<< HEAD
-            Wire.setSCL(pin::BNO055_SCL); 
-            Wire.setSDA(pin::BNO055_SDA); 
-            Wire.beginTransmission(0x28);
-            imu.begin();
-            Serial.print(this->sensor_name);
-            Serial.println(" Attach");
-=======
             bno055 = Adafruit_BNO055(55, 0x28);
             if (!bno055.begin())
             {
@@ -52,46 +33,82 @@ namespace sensor
             }
             bno055.setExtCrystalUse(true);
             current_heading = 0;
->>>>>>> 01a00c663e643e510655256f5849c00e897c803e
         }
 
         void BNO055Compass::Update()
         {
-<<<<<<< HEAD
-            acc = imu.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
-            gyr = imu.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
-            mag = imu.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
-
-            current_heading = atan2(mag.y(),mag.x());
-            Serial.print(this->sensor_name);
-            Serial.println(" Update");
-=======
-            acc = bno055.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
-            gyr = bno055.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
-            mag = bno055.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
+            double sumx = 0,sumy = 0,sumz = 0;
 
             imu::Vector<3> euler = bno055.getVector(Adafruit_BNO055::VECTOR_EULER);
-
             current_heading = euler.x();
->>>>>>> 01a00c663e643e510655256f5849c00e897c803e
+
+            imu::Vector<3> acc_temp = bno055.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
+            imu::Vector<3> gyr_temp = bno055.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
+            imu::Vector<3> mag_temp = bno055.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
+
+            acc_history[put_index] = acc_temp;
+            gyr_history[put_index] = gyr_temp;
+            mag_history[put_index] = mag_temp;
+
+            put_index++;
+            if(put_index == filter_length)
+            {
+                put_index = 0;
+            }
+
+            uint8_t index = put_index;
+
+            for(uint8_t i = 0; i < filter_length; ++i)
+            {
+                index = (index != 0) ? index - 1 : filter_length - 1;
+                sumx += filter_taps[i] * acc_history[index].x();
+                sumy += filter_taps[i] * acc_history[index].y();
+                sumz += filter_taps[i] * acc_history[index].z();
+            }
+            acc[0] = sumx;
+            acc[1] = sumy;
+            acc[2] = sumz;
+
+            sumx = 0.0;
+            sumy = 0.0;
+            sumz = 0.0;
+
+            for(uint8_t i = 0; i < filter_length; ++i)
+            {
+                index = (index != 0) ? index - 1 : filter_length - 1;
+                sumx += filter_taps[i] * gyr_history[index].x();
+                sumy += filter_taps[i] * gyr_history[index].y();
+                sumz += filter_taps[i] * gyr_history[index].z();
+            }
+            gyr[0] = sumx;
+            gyr[1] = sumy;
+            gyr[2] = sumz;
+
+            sumx = 0.0;
+            sumy = 0.0;
+            sumz = 0.0;
+
+            for(uint8_t i = 0; i < filter_length; ++i)
+            {
+                index = (index != 0) ? index - 1 : filter_length - 1;
+                sumx += filter_taps[i] * mag_history[index].x();
+                sumy += filter_taps[i] * mag_history[index].y();
+                sumz += filter_taps[i] * mag_history[index].z();
+            }
+            mag[0] = sumx;
+            mag[1] = sumy;
+            mag[2] = sumz;
+
         }
 
         bool BNO055Compass::Calibrate()
         {
             uint8_t system, gyro, accel, mg = 0;
-<<<<<<< HEAD
-            imu.getCalibration(&system, &gyro, &accel, &mg);
-
-            Serial.print(this->sensor_name);
-            Serial.println(" Calibrate");
-            if((system == 0)||(gyro == 0)||(accel==0)||(mg==0))
-=======
             bno055.getCalibration(&system, &gyro, &accel, &mg);
 
             Serial.print(this->sensor_name);
             Serial.println(" Calibrate");
             if ((system == 0) || (gyro == 0) || (accel == 0) || (mg == 0))
->>>>>>> 01a00c663e643e510655256f5849c00e897c803e
             {
                 return false;
             }
@@ -108,15 +125,6 @@ namespace sensor
             Serial.println("=================");
         }
 
-<<<<<<< HEAD
-        int BNO055Compass::getHeading()
-        {
-            Serial.print(this->sensor_name);
-            Serial.println(" Get Heading");
-            return current_heading;
-        }
-
-=======
         double BNO055Compass::GetHeading() const
         {
             return current_heading;
@@ -124,12 +132,8 @@ namespace sensor
 
         std::tuple<double, double, double> BNO055Compass::GetAccelVector()
         {
-            imu::Vector<3> accel = bno055.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
-
-            return std::make_tuple(accel[0], accel[1], accel[2]);
+            return std::make_tuple(acc[0], acc[1], acc[2]);
         }
-
->>>>>>> 01a00c663e643e510655256f5849c00e897c803e
 
     }  // namespace compass
 

@@ -155,6 +155,7 @@ namespace controller
         {
             landing_status_state.push_back(false);
         }
+
         landing_status_state.pop_front();
 
         // check if confirm landing
@@ -191,8 +192,11 @@ namespace controller
     }
 
     bool RoverController::WithinLimit(double src, double val, double limit) const
-    {
-        return false;
+    {   
+        if(src - val > limit)
+            return false;
+        else 
+            return true;
     }
     bool RoverController::GetLandingStatus() const
     {
