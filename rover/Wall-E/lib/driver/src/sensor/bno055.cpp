@@ -11,8 +11,6 @@ namespace sensor
 
         bool BNO055Compass::CheckConnection()
         {
-            Serial.print(this->sensor_name);
-            Serial.println(" Checking Connection");
             if(bno055.begin())
             {
                 Serial.println(" Connected!");
