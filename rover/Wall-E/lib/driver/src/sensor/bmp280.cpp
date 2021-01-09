@@ -1,7 +1,7 @@
 
 #include <constants.h>
 #include <pin_assignment.h>
-#include <sensor/barometer.h>
+#include <sensor/bmp280.h>
 namespace sensor
 {
     namespace barometer
@@ -17,25 +17,27 @@ namespace sensor
             {
                 case LogicMode::I2C:
                 {
-                    bmp = new Adafruit_BMP280(&Wire1);
+                    bmp = Adafruit_BMP280(&Wire);
                     break;
                 };
                 case LogicMode::SPI:
                 {
-                    bmp = new Adafruit_BMP280(pin::BMP_CS, pin::BMP_MOSI, pin::BMP_MISO,
-                                              pin::BMP_SCK);
+                    bmp = Adafruit_BMP280(pin::BMP_CS, pin::BMP_MOSI, pin::BMP_MISO,
+                                          pin::BMP_SCK);
                 };
                 default:
                     break;
             }
 
-            bmp->setSampling(Adafruit_BMP280::MODE_NORMAL,     /* Operating Mode. */
-                             Adafruit_BMP280::SAMPLING_X2,     /* Temp. oversampling */
-                             Adafruit_BMP280::SAMPLING_X16,    /* Pressure oversampling */
-                             Adafruit_BMP280::FILTER_X16,      /* Filtering. */
-                             Adafruit_BMP280::STANDBY_MS_500); /* Standby time. */
+            bmp.reset();
+            bmp.setSampling(Adafruit_BMP280::MODE_FORCED,      /* Operating Mode. */
+                            Adafruit_BMP280::SAMPLING_X2,      /* Temp. oversampling */
+                            Adafruit_BMP280::SAMPLING_X16,     /* Pressure oversampling */
+                            Adafruit_BMP280::FILTER_X16,       /* Filtering. */
+                            Adafruit_BMP280::STANDBY_MS_1000); /* Standby time. */
 
-            if (!bmp->begin())
+            // the default address for BMP280 is 0x77.
+            if (!bmp.begin(0x76, 0x58))
             {
                 /* There was a problem detecting the BNO055 ... check your connections
                  */
@@ -53,7 +55,7 @@ namespace sensor
 
         void BMP280Barometer::Update()
         {
-            current_altitude = bmp->readAltitude(1013.25);
+            current_altitude = bmp.readAltitude(1013.25);
         }
 
         bool BMP280Barometer::Calibrate()
@@ -63,17 +65,22 @@ namespace sensor
 
         void BMP280Barometer::Debug()
         {
+            Serial.println("=========");
             Serial.print("Temperature = ");
-            Serial.print(bmp->readTemperature());
+            Serial.print(bmp.readTemperature());
             Serial.println(" *C");
 
             Serial.print("Pressure = ");
-            Serial.print(bmp->readPressure());
+            Serial.print(bmp.readPressure());
             Serial.println(" Pa");
 
             Serial.print("Approx altitude = ");
-            Serial.print(bmp->readAltitude(1013.25)); /* Adjusted to local forecast! */
+            Serial.print(bmp.readAltitude(1013.25)); /* Adjusted to local forecast! */
             Serial.println(" m");
+
+            Serial.printf("Sensor status %d \n", bmp.getStatus());
+
+            Serial.println("=========");
         }
         double BMP280Barometer::GetAltitude() const
         {

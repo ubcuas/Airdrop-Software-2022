@@ -5,7 +5,7 @@
 #include <actuator/servo.h>
 #include <constants.h>
 #include <sensor/adafruit_ultimate_gps.h>
-#include <sensor/barometer.h>
+#include <sensor/bmp280.h>
 #include <sensor/bno055.h>
 #include <sensor/ppm_receiver.h>
 
@@ -45,7 +45,7 @@ static THD_FUNCTION(Thread0, arg)
     }
 }
 
-static THD_WORKING_AREA(EstimationThread, 200);
+static THD_WORKING_AREA(EstimationThread, 1024);
 
 static THD_FUNCTION(Thread1, arg)
 {
@@ -55,7 +55,7 @@ static THD_FUNCTION(Thread1, arg)
         if (connected)
         {
             // rover_gps->Update();
-            bmp280->Update();
+            // bmp280->Update();
             chThdSleepMilliseconds(timing::ESTIMATION_TASK_MS);
         }
     }
@@ -178,8 +178,9 @@ uint32_t gpsTimer = millis();
 void loop()
 {
     bmp280->Debug();
+    rover_compass->Debug();
 
-    chThdSleepMilliseconds(250);
+    chThdSleepMilliseconds(1000);
     // if (connected)
     // {
     //     switch (ppm_rc->ReadRCSwitchMode())
@@ -241,12 +242,12 @@ void loop()
     //             break;
     //     }
 
-    rover_gps->Read();
+    // rover_gps->Read();
 
-    if (millis() - gpsTimer > 1000)
-    {
-        gpsTimer = millis();
+    // if (millis() - gpsTimer > 1000)
+    // {
+    //     gpsTimer = millis();
 
-        rover_gps->Update();
-    }
+    //     rover_gps->Update();
+    // }
 }

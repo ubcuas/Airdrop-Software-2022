@@ -19,7 +19,7 @@ namespace sensor
         class BMP280Barometer : public Sensor
         {
            private:
-            Adafruit_BMP280* bmp;
+            Adafruit_BMP280 bmp;
             LogicMode mode;
             double starting_altitude;
             double current_altitude;

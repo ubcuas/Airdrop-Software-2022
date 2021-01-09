@@ -19,7 +19,8 @@ namespace sensor
 
         void BNO055Compass::Attach()
         {
-            bno055 = Adafruit_BNO055(55, 0x28);
+            // Use Wire1 for BN055 since Wire1 doesn't work for BMP280
+            bno055 = Adafruit_BNO055(55, 0x28, &Wire1);
             if (!bno055.begin())
             {
                 Serial.print("No BNO055 detected");
