@@ -9,30 +9,41 @@
 
 namespace sensor
 {
-    class BMP280Barometer : public Sensor
+    namespace barometer
     {
-       private:
-        Adafruit_BMP280 bmp;
+        enum LogicMode
+        {
+            SPI,
+            I2C
+        };
+        class BMP280Barometer : public Sensor
+        {
+           private:
+            Adafruit_BMP280* bmp;
+            LogicMode mode;
+            double starting_altitude;
+            double current_altitude;
 
-       public:
-        using Sensor::Sensor;
-        virtual bool CheckConnection() override;
+            double takeoff_altitude;
+            bool start_landing_detection;
 
-        virtual void Attach() override;
+           public:
+            using Sensor::Sensor;
 
-        virtual void Update() override;
+            BMP280Barometer(LogicMode mode, String name) : Sensor(name), mode(mode){};
 
-        virtual bool Calibrate() override;
+            virtual bool CheckConnection() override;
 
-        virtual void Debug() override;
-        
-        double starting_altitude;
-        double current_altitude;
+            virtual void Attach() override;
 
-        double takeoff_altitude;
-        bool start_landing_detection;
+            virtual void Update() override;
 
+            virtual bool Calibrate() override;
 
-        double GetAltitude() const;
-    };
+            virtual void Debug() override;
+
+            double GetAltitude() const;
+        };
+    }  // namespace barometer
+
 }  // namespace sensor
