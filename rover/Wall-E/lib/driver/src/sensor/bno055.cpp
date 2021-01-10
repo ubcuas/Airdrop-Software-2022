@@ -56,7 +56,7 @@ namespace sensor
 
             uint8_t index = put_index;
 
-            for(uint8_t i = 0; i < filter_length; ++i)
+            for(uint8_t i = 0; i < filter_length; i++)
             {
                 index = (index != 0) ? index - 1 : filter_length - 1;
                 sumx += filter_taps[i] * acc_history[index].x();
@@ -71,7 +71,7 @@ namespace sensor
             sumy = 0.0;
             sumz = 0.0;
 
-            for(uint8_t i = 0; i < filter_length; ++i)
+            for(uint8_t i = 0; i < filter_length; i++)
             {
                 index = (index != 0) ? index - 1 : filter_length - 1;
                 sumx += filter_taps[i] * gyr_history[index].x();
@@ -86,7 +86,7 @@ namespace sensor
             sumy = 0.0;
             sumz = 0.0;
 
-            for(uint8_t i = 0; i < filter_length; ++i)
+            for(uint8_t i = 0; i < filter_length; i++)
             {
                 index = (index != 0) ? index - 1 : filter_length - 1;
                 sumx += filter_taps[i] * mag_history[index].x();
