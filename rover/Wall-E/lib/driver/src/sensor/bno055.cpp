@@ -48,11 +48,7 @@ namespace sensor
             gyr_history[put_index] = gyr_temp;
             mag_history[put_index] = mag_temp;
 
-            put_index++;
-            if(put_index == filter_length)
-            {
-                put_index = 0;
-            }
+            put_index = (put_index == (filter_length - 1))? 0 : (put_index + 1);
 
             uint8_t index = put_index;
 
