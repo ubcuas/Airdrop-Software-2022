@@ -20,11 +20,16 @@ namespace pin
 
     const static uint8_t GPS_TX     = 1;
     const static uint8_t GPS_RX     = 0;
-    const static uint8_t BNO055_SCL = 19;
-    const static uint8_t BNO055_SDA = 18;
+    const static uint8_t BMP280_SCL = 19;
+    const static uint8_t BMP280_SDA = 18;
+    const static uint8_t BNO055_SCL = 16;
+    const static uint8_t BNO055_SDA = 17;
     const static uint8_t LCD_TX     = 20;
     const static uint8_t LCD_RX     = 21;
 
+    const static uint8_t XBEE_TX   = 14;
+    const static uint8_t XBEE_RX   = 15;
+    
     const static uint8_t SERVO_PIN = 5;
 
     const static uint8_t BMP_SCK  = 13;
@@ -34,7 +39,7 @@ namespace pin
 
     const static uint8_t THROTTLE_PIN = 11;
     const static uint8_t YAW_PIN      = 12;
-    const static uint8_t SWITCH_PIN = 2;  // replace, this is not a pwm pin
+    const static uint8_t SWITCH_PIN   = 2;  // replace, this is not a pwm pin
 
 #else
     // UNO pin assignment
