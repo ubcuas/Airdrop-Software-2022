@@ -47,3 +47,10 @@ namespace magic
     const static int MIN_MOTOR_INPUT       = 40;
     const static int PERCENTAGE            = 100;
 }  // namespace magic
+
+namespace config
+{
+    const static int SCREEN_WIDTH  = 128;
+    const static int SCREEN_HEIGHT = 32;
+    const static int OLED_RESET    = 4;
+}  // namespace config

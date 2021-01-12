@@ -3,6 +3,7 @@
 #include <Wire.h>
 #include <actuator/dc_motor.h>
 #include <actuator/servo.h>
+#include <comm/oled.h>
 #include <constants.h>
 #include <sensor/adafruit_ultimate_gps.h>
 #include <sensor/bmp280.h>
@@ -23,7 +24,8 @@ motor::DCMotor* left_motor;
 motor::DCMotor* right_motor;
 servo::Servo* drop_servo;
 controller::RoverController* rover_controller;
-barometer::BMP280Barometer* bmp280;
+barometer::BMP280Barometer* rover_barometer;
+display::OLED* rover_oled;
 
 bool connected = true;
 bool led_state = false;
@@ -56,7 +58,7 @@ static THD_FUNCTION(Thread1, arg)
         if (connected)
         {
             rover_gps->Update();
-            // bmp280->Update();
+
             chThdSleepMilliseconds(1000);
         }
     }
@@ -72,6 +74,7 @@ static THD_FUNCTION(Thread2, arg)
         if (connected)
         {
             rover_compass->Update();
+            rover_barometer->Update();
             // TODO: figure out motor update frequency
             // left_motor->Update();
             // right_motor->Update();
@@ -145,7 +148,10 @@ void setup()
     right_motor = new motor::DCMotor("right_motor", motor::MotorMapping::RIGHT_MOTOR);
     drop_servo  = new servo::Servo("servo");
 
-    bmp280 = new barometer::BMP280Barometer(barometer::LogicMode::I2C, "barometer");
+    rover_barometer =
+        new barometer::BMP280Barometer(barometer::LogicMode::I2C, "barometer");
+
+    rover_oled = new display::OLED();
 
     Serial.println("=============== AUVSI Rover ======================");
 
@@ -155,7 +161,7 @@ void setup()
     // left_motor->Attach();
     // right_motor->Attach();
     // drop_servo->Attach();
-    bmp280->Attach();
+    rover_barometer->Attach();
 
     connected = true;
     // calibration procedure
@@ -175,8 +181,15 @@ uint32_t count = 0;
 
 void loop()
 {
+    display::oled_dict data;
+    data.heading   = rover_compass->GetHeading();
+    data.latitude  = rover_gps->GetCurrentGPSCoordinate().first;
+    data.longitude = rover_gps->GetCurrentGPSCoordinate().second;
+    data.altitude  = rover_barometer->GetAltitude();
+
     Serial.printf("[Count]: %ld\n", count);
-    bmp280->Debug();
+    rover_oled->displayDebugMessage(&data);
+    rover_barometer->Debug();
     rover_compass->Debug();
     rover_gps->Debug();
     count += 1;
