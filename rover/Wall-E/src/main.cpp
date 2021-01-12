@@ -30,7 +30,7 @@ bool led_state = false;
 
 MUTEX_DECL(dataMutex);
 
-static THD_WORKING_AREA(GPSThread, 200);
+static THD_WORKING_AREA(GPSThread, 1024);
 
 static THD_FUNCTION(Thread0, arg)
 {
@@ -54,14 +54,14 @@ static THD_FUNCTION(Thread1, arg)
     {
         if (connected)
         {
-            // rover_gps->Update();
+            rover_gps->Update();
             // bmp280->Update();
-            chThdSleepMilliseconds(timing::ESTIMATION_TASK_MS);
+            chThdSleepMilliseconds(1000);
         }
     }
 }
 
-static THD_WORKING_AREA(SlowThread, 200);
+static THD_WORKING_AREA(SlowThread, 1024);
 
 static THD_FUNCTION(Thread2, arg)
 {
@@ -72,9 +72,9 @@ static THD_FUNCTION(Thread2, arg)
         {
             rover_compass->Update();
             // TODO: figure out motor update frequency
-            left_motor->Update();
-            right_motor->Update();
-            drop_servo->Update();
+            // left_motor->Update();
+            // right_motor->Update();
+            // drop_servo->Update();
             chThdSleepMilliseconds(timing::SLOW_TASK_MS);
         }
     }
@@ -149,7 +149,7 @@ void setup()
     Serial.println("=============== AUVSI Rover ======================");
 
     rover_compass->Attach();
-    // rover_gps->Attach();
+    rover_gps->Attach();
     // ppm_rc->Attach();
     // left_motor->Attach();
     // right_motor->Attach();
@@ -161,9 +161,6 @@ void setup()
 
     // rover_compass->Calibrate();
     // rover_gps->Calibrate();
-
-
-    pinMode(LED_BUILTIN, OUTPUT);
 
     chBegin(chSetup);
 
@@ -177,10 +174,21 @@ uint32_t gpsTimer = millis();
 
 void loop()
 {
-    bmp280->Debug();
-    rover_compass->Debug();
+    rover_gps->Read();
 
-    chThdSleepMilliseconds(1000);
+    if (millis() - gpsTimer > 1000)
+    {
+        gpsTimer = millis();
+        bmp280->Debug();
+        rover_compass->Debug();
+        rover_gps->Debug();
+
+
+        rover_gps->Update();
+    }
+    
+    // chThdSleepMilliseconds(1);
+    chThdSleepMicroseconds(1);
     // if (connected)
     // {
     //     switch (ppm_rc->ReadRCSwitchMode())
@@ -241,13 +249,4 @@ void loop()
     //         default:
     //             break;
     //     }
-
-    // rover_gps->Read();
-
-    // if (millis() - gpsTimer > 1000)
-    // {
-    //     gpsTimer = millis();
-
-    //     rover_gps->Update();
-    // }
 }

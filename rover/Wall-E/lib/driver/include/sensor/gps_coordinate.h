@@ -9,8 +9,8 @@ namespace sensor
         class GPSCoordinate
         {
            private:
-            double latitude;
-            double longitude;
+            float latitude;
+            float longitude;
 
            public:
             /**
@@ -19,17 +19,17 @@ namespace sensor
              * @param lat latitude of the coordinate in decimal degrees
              * @param longi longitude of the coordinate in decimal degrees
              */
-            GPSCoordinate(double lat, double longi);
-            double GetLatitude() const;
-            double GetLongitude() const;
-            void SetLatitude(double lat);
-            void SetLongitude(double longi);
-            double GetDistance(GPSCoordinate dest);
-            double GetHeading(GPSCoordinate dest);
-            static double GetDistanceBetween(GPSCoordinate src, GPSCoordinate dest);
-            static double GetHeadingBetween(GPSCoordinate src, GPSCoordinate dest);
-            static double DistanceBetween(double lat1, double long1, double lat2, double long2);
-            static double CourseTo(double lat1, double long1, double lat2, double long2);
+            GPSCoordinate(float lat, float longi);
+            float GetLatitude() const;
+            float GetLongitude() const;
+            void SetLatitude(float lat);
+            void SetLongitude(float longi);
+            float GetDistance(GPSCoordinate dest);
+            float GetHeading(GPSCoordinate dest);
+            static float GetDistanceBetween(GPSCoordinate src, GPSCoordinate dest);
+            static float GetHeadingBetween(GPSCoordinate src, GPSCoordinate dest);
+            static float DistanceBetween(float lat1, float long1, float lat2, float long2);
+            static float CourseTo(float lat1, float long1, float lat2, float long2);
 
             /**
              * @brief Get the Intermediate Point object
@@ -37,10 +37,10 @@ namespace sensor
              * @param src 
              * @param dest 
              * @param distance 
-             * @return double 
+             * @return float 
              */
-            static std::pair<double, double> GetIntermediatePoint(GPSCoordinate src, GPSCoordinate dest, double distance);
-            std::pair<double, double> ConvertToPair() const;
+            static std::pair<float, float> GetIntermediatePoint(GPSCoordinate src, GPSCoordinate dest, float distance);
+            std::pair<float, float> ConvertToPair() const;
         };
     }  // namespace gps
 

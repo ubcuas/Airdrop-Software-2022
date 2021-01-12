@@ -1,3 +1,22 @@
+/**
+ * @file bno055.h
+ * @author your name (you@domain.com)
+ * @brief
+ * @version 0.1
+ * @date 2021-01-11
+ *  Board layout:
+         +----------+
+         |         *| RST   PITCH  ROLL  HEADING
+     ADR |*        *| SCL
+     INT |*        *| SDA     ^            /->
+     PS1 |*        *| GND     |            |
+     PS0 |*        *| 3VO     Y    Z-->    \-X
+         |         *| VIN
+         +----------+
+
+ * @copyright Copyright (c) 2021
+ *
+ */
 #pragma once
 
 #include <Adafruit_BNO055.h>
