@@ -22,7 +22,7 @@ namespace display
         display.setTextSize(1);               // Normal 1:1 pixel scale
         display.setTextColor(SSD1306_WHITE);  // Draw white text
         display.setCursor(0, 0);              // Start at top-left corner
-        display.printf("x: %.3f, y: y: %.3f\n", input->x, input->y);
+        display.printf("x: %.3f, y: %.3f\n", input->x, input->y);
         display.printf("h: %04.1f, alt: %04.2f\n", input->heading, input->altitude);
         display.printf("lat: %.4f\nlon: %.4f\n", input->latitude, input->longitude);
         display.display();

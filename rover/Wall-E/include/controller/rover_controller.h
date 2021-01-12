@@ -1,4 +1,14 @@
-#pragma once
+/**
+ * @file rover_controller.h
+ * @author your name (you@domain.com)
+ * @brief Controller for the Rover, include rover's control mapping, estimation and
+ * localization
+ * @version 0.1
+ * @date 2021-01-12
+ *
+ * @copyright Copyright (c) 2021
+ *
+ */
 #include <Adafruit_BNO055.h>
 #include <constants.h>
 #include <sensor/gps_coordinate.h>
