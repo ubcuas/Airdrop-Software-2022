@@ -27,9 +27,9 @@ namespace pin
     const static uint8_t LCD_TX     = 20;
     const static uint8_t LCD_RX     = 21;
 
-    const static uint8_t XBEE_TX   = 14;
-    const static uint8_t XBEE_RX   = 15;
-    
+    const static uint8_t XBEE_TX = 14;
+    const static uint8_t XBEE_RX = 15;
+
     const static uint8_t SERVO_PIN = 5;
 
     const static uint8_t BMP_SCK  = 13;
@@ -54,8 +54,8 @@ namespace pin
 
     // const static uint8_t RC_INPUT      = 2;
 
-    const static uint8_t GPS_TX_PIN = 9;
-    const static uint8_t GPS_RX_PIN = 8;
+    const static uint8_t GPS_TX_PIN = 1;
+    const static uint8_t GPS_RX_PIN = 0;
 
     const static uint8_t SERVO_PIN = 10;
 

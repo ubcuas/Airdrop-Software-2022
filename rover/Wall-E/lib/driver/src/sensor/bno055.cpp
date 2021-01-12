@@ -59,7 +59,7 @@ namespace sensor
 
         void BNO055Compass::Debug()
         {
-            Serial.printf("Compass \n=================\n");
+            Serial.printf("[Compass] \n=================\n");
             Serial.printf("Current heading: %f\n", current_heading);
             Serial.println("=================");
         }

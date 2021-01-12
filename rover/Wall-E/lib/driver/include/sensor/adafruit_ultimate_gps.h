@@ -15,7 +15,7 @@ namespace sensor
            private:
             GPSCoordinate* current_location;
             GPSCoordinate* last_location;
-            Adafruit_GPS GPS;
+            Adafruit_GPS* GPS;
 
            public:
             using Sensor::Sensor;

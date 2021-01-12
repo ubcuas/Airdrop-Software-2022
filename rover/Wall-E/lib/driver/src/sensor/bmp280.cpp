@@ -65,7 +65,7 @@ namespace sensor
 
         void BMP280Barometer::Debug()
         {
-            Serial.printf("Barometer\n=========\n");
+            Serial.printf("[Barometer]\n=========\n");
             Serial.print("Temperature = ");
             Serial.print(bmp.readTemperature());
             Serial.println(" *C");

@@ -39,7 +39,8 @@ static THD_FUNCTION(Thread0, arg)
     {
         if (connected)
         {
-            // rover_gps->Read();
+            rover_gps->Read();
+
             chThdSleepMilliseconds(timing::GPS_TRACKING_MS);
         }
     }
@@ -170,25 +171,17 @@ void setup()
 }
 
 
-uint32_t gpsTimer = millis();
+uint32_t count = 0;
 
 void loop()
 {
-    rover_gps->Read();
-
-    if (millis() - gpsTimer > 1000)
-    {
-        gpsTimer = millis();
-        bmp280->Debug();
-        rover_compass->Debug();
-        rover_gps->Debug();
-
-
-        rover_gps->Update();
-    }
-    
-    // chThdSleepMilliseconds(1);
-    chThdSleepMicroseconds(1);
+    Serial.printf("[Count]: %ld\n", count);
+    bmp280->Debug();
+    rover_compass->Debug();
+    rover_gps->Debug();
+    count += 1;
+    chThdSleepMilliseconds(1000);
+    // chThdSleepMicroseconds(1);
     // if (connected)
     // {
     //     switch (ppm_rc->ReadRCSwitchMode())
