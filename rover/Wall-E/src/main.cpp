@@ -48,11 +48,24 @@ static THD_FUNCTION(Thread2, arg)
     }
 }
 
+static THD_WORKING_AREA(STATE_THREAD, 1024);
+
+static THD_FUNCTION(Thread3, arg)
+{
+    (void)arg;  // avoid warning on unused parameters.
+    while (true)
+    {
+        state_machine->StateMachineUpdate();
+        chThdSleepMilliseconds(timing::STATE_TASK_MS);
+    }
+}
+
 void chSetup()
 {
     chThdCreateStatic(FAST_THREAD, sizeof(FAST_THREAD), HIGHPRIO, Thread0, NULL);
-    chThdCreateStatic(CONTROL_THREAD, sizeof(CONTROL_THREAD), LOWPRIO, Thread1, NULL);
     chThdCreateStatic(SLOW_THREAD, sizeof(SLOW_THREAD), NORMALPRIO, Thread2, NULL);
+    chThdCreateStatic(CONTROL_THREAD, sizeof(CONTROL_THREAD), LOWPRIO, Thread1, NULL);
+    chThdCreateStatic(STATE_THREAD, sizeof(STATE_THREAD), LOWPRIO, Thread3, NULL);
 }
 
 void setup()
@@ -72,7 +85,6 @@ uint32_t count = 0;
 
 void loop()
 {
-    state_machine->StateMachineUpdate();
     state_machine->Debug();
-    chThdSleepMilliseconds(timing::STATE_TASK_MS);
+    chThdSleepMilliseconds(500);
 }

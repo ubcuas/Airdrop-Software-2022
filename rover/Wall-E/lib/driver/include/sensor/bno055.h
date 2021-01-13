@@ -79,6 +79,20 @@ namespace sensor
              * @return std::tuple<double, double, double>
              */
             std::tuple<double, double, double> GetAccelVector();
+
+            /**
+             * @brief Return the Euler. Not including the gravity.
+             *
+             * @return std::tuple<double, double, double>
+             */
+            std::tuple<double, double, double> GetOrientationAccelVector();
+
+            /**
+             * @brief Get the Euler Vector object
+             * 
+             * @return std::tuple<double, double, double> 
+             */
+            std::tuple<double, double, double> GetEulerVector();
         };
     }  // namespace compass
 
