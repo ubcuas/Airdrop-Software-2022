@@ -4,15 +4,11 @@
 namespace timing
 {
     const static int ESTIMATION_TASK_MS = 250;
-    const static int FAST_TASK_MS       = 10;
-
-    const static int SLOW_TASK_MS = 150;
-
-    const static int GPS_IDLE_MS = 1000;
-
-    const static int GPS_TRACKING_MS = 1;
-
-    const static int STATE_TASK_MS = 600;
+    const static int FAST_TASK_MS       = 1;
+    const static int SLOW_TASK_MS       = 33;
+    const static int GPS_IDLE_MS        = 1000;
+    const static int GPS_TRACKING_MS    = 1;
+    const static int STATE_TASK_MS      = 600;
 }  // namespace timing
 
 namespace estimation
@@ -24,14 +20,19 @@ namespace estimation
     const static double INTERMEDIATE_WAYPOINT_THRESHOLD = 5;  // m
     const static double FINAL_WAYPOINT_THRESHOLD        = 1;  // m
     const static int WAYPOINT_NUMBER                    = 10;
-    const static int LANDING_DETECTION_HISTORY_LENGTH   = 100;
-    const static double DELTA_HEIGHT_THRESHOLD          = 30;
-    const static double LANDING_ACCEL_THRESH            = 0.1;
-    const static double LANDING_STATUS_CONFIRM_THRESH   = 0.8;  // percent
-    const static double MOTOR_TURN_MIN_THRESH           = 5;    // degree
-    const static double MOTOR_TURN_MAX_THRESH           = 100;  // degree
-    const static double FULL_POWER                      = 100;  // percent
-    const static double FULL_ANGLE                      = 180;  // degree
+
+    // landing controller
+    // delay = ESTIMATION_TASK_MS * LANDING_DETECTION_HISTORY_LENGTH / 1000 (s)
+    const static int LANDING_DETECTION_HISTORY_LENGTH = 100;
+    const static double LANDING_ACCEL_THRESH          = 0.5;
+    const static double LANDING_ACCEL_HISTORY_THRESH  = 1.0;
+
+    const static double DELTA_HEIGHT_THRESHOLD        = 30;
+    const static double LANDING_STATUS_CONFIRM_THRESH = 0.8;  // percent
+    const static double MOTOR_TURN_MIN_THRESH         = 5;    // degree
+    const static double MOTOR_TURN_MAX_THRESH         = 100;  // degree
+    const static double FULL_POWER                    = 100;  // percent
+    const static double FULL_ANGLE                    = 180;  // degree
 }  // namespace estimation
 
 namespace magic

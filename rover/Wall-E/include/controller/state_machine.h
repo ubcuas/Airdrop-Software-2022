@@ -27,9 +27,12 @@
 #define STATE_MACHINE_DEBUG true
 namespace controller
 {
+    // This is a very ugly way to map Enum to string. However, the alternative are
+    // unnecessarily complicated
+    const String auto_state_name[5] = {"IDLE", "DROP", "LAND", "DRIVE", "ARRIVED"};
     enum AutoState
     {
-        IDLE,
+        IDLE = 0,
         DROP,
         LAND,
         DRIVE,

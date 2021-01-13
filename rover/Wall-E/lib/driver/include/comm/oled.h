@@ -14,6 +14,7 @@ namespace display
         float y         = 0;
         float x_dot     = 0;
         float y_dot     = 0;
+        String state    = "";
     };
     class OLED
     {
@@ -21,6 +22,7 @@ namespace display
         Adafruit_SSD1306 display;
         bool connected;
         oled_dict data;
+
        public:
         OLED();
         void displayDebugMessage(oled_dict *input);

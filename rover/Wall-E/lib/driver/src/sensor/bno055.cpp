@@ -59,8 +59,10 @@ namespace sensor
 
         void BNO055Compass::Debug()
         {
+            imu::Vector<3> accel = bno055.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
             Serial.printf("[Compass] \n=================\n");
             Serial.printf("Current heading: %f\n", current_heading);
+            Serial.printf("x: %f, y: %f, z: %f\n", accel[0], accel[1], accel[2]);
             Serial.println("=================");
         }
 

@@ -72,7 +72,7 @@ uint32_t count = 0;
 
 void loop()
 {
-    // state_machine->StateMachineUpdate();
+    state_machine->StateMachineUpdate();
     state_machine->Debug();
     chThdSleepMilliseconds(timing::STATE_TASK_MS);
 }

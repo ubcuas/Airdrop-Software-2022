@@ -82,6 +82,9 @@ namespace controller
     {
         rover_barometer->Update();
         rover_compass->Update();
+        double accelx, accely, accelz;
+        std::tie(accelx, accely, accelz) = rover_compass->GetAccelVector();
+        landing_controller->LandingDetectionUpdate(accelx, accely, accelz);
     }
     void StateMachine::FastUpdate()
     {
@@ -100,13 +103,14 @@ namespace controller
         rover_barometer->Debug();
         rover_compass->Debug();
         rover_gps->Debug();
+        landing_controller->Debug();
 
         display::oled_dict data;
         data.heading   = rover_compass->GetHeading();
         data.latitude  = rover_gps->GetCurrentGPSCoordinate().first;
         data.longitude = rover_gps->GetCurrentGPSCoordinate().second;
         data.altitude  = rover_barometer->GetAltitude();
-
+        data.state     = auto_state_name[current_state];
         // Serial.printf("[Count]: %ld\n", count);
         rover_oled->displayDebugMessage(&data);
     }
@@ -129,27 +133,25 @@ namespace controller
                 break;
             case AutoState::DROP:
                 current_state = AutoState::LAND;
+                landing_controller->Start();
                 break;
             case AutoState::LAND:
             {
-                if (!landing_controller->GetLandingStatus())
-                {
-                    double accelx, accely, accelz;
-                    std::tie(accelx, accely, accelz) = rover_compass->GetAccelVector();
-                    landing_controller->LandingDetectionUpdate(accelx, accely, accelz);
-                }
-                else
+                if (landing_controller->GetLandingStatus())
                 {
                     current_state = AutoState::DRIVE;
+                    landing_controller->End();
                 }
                 break;
             }
             case AutoState::DRIVE:
             {
+                // TODO: testing
+                return;
+
                 if (!rover_gps->WaitForGPSConnection())
                 {
-                    planning->CreateWaypoint(
-                        rover_gps->GetCurrentGPSCoordinate());
+                    planning->CreateWaypoint(rover_gps->GetCurrentGPSCoordinate());
                 }
                 if (!planning->FinalArrived())
                 {
@@ -157,9 +159,8 @@ namespace controller
                     // waypoint, instead depend on GPS corrdiante. update the current
                     // controller
                     auto current_coordinate = rover_gps->GetCurrentGPSCoordinate();
-                    auto target_coordinate =
-                        planning->UpdateWaypoint(current_coordinate);
-                    auto auto_result = controller::RoverController::AutoController(
+                    auto target_coordinate = planning->UpdateWaypoint(current_coordinate);
+                    auto auto_result       = controller::RoverController::AutoController(
                         current_coordinate, target_coordinate);
                     auto motor_result = controller::RoverController::MotorController(
                         auto_result.first, auto_result.second);
