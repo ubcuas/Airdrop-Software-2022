@@ -22,6 +22,7 @@ namespace estimation
     const static int WAYPOINT_NUMBER                    = 10;
 
     // landing controller
+    // TODO: calibrate for these numbers
     // delay = ESTIMATION_TASK_MS * LANDING_DETECTION_HISTORY_LENGTH / 1000 (s)
     const static int LANDING_DETECTION_HISTORY_LENGTH = 100;
     const static double LANDING_ACCEL_THRESH          = 0.5;

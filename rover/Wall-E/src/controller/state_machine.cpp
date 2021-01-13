@@ -18,7 +18,7 @@ namespace controller
         rover_oled = new display::OLED();
 
         // controller initialization
-        rover_controller   = new controller::RoverController();
+        rover_controller   = new controller::RoverController(timing::SLOW_TASK_MS);
         landing_controller = new controller::LandingController();
         planning           = new controller::Planning();
 
@@ -82,9 +82,11 @@ namespace controller
     {
         rover_barometer->Update();
         rover_compass->Update();
-        double accelx, accely, accelz;
-        std::tie(accelx, accely, accelz) = rover_compass->GetAccelVector();
-        landing_controller->LandingDetectionUpdate(accelx, accely, accelz);
+        
+        landing_controller->LandingDetectionUpdate(rover_compass->GetAccelVector());
+        rover_controller->RoverControllerUpdate(
+            rover_compass->GetAccelVector(), rover_compass->GetOrientationAccelVector(),
+            rover_compass->GetEulerVector());
     }
     void StateMachine::FastUpdate()
     {
@@ -100,12 +102,15 @@ namespace controller
     void StateMachine::LEDUpdate() {}
     void StateMachine::Debug()
     {
-        rover_barometer->Debug();
+        // rover_barometer->Debug();
         rover_compass->Debug();
-        rover_gps->Debug();
-        landing_controller->Debug();
+        // rover_gps->Debug();
+        // landing_controller->Debug();
+        rover_controller->Debug();
 
         display::oled_dict data;
+        data.x = rover_controller->q[0];
+        data.y = rover_controller->q[1];
         data.heading   = rover_compass->GetHeading();
         data.latitude  = rover_gps->GetCurrentGPSCoordinate().first;
         data.longitude = rover_gps->GetCurrentGPSCoordinate().second;

@@ -11,6 +11,8 @@
  */
 
 #include <constants.h>
+#include <utility/imumaths.h>
+
 #include <tuple>
 
 namespace controller
@@ -18,11 +20,33 @@ namespace controller
     class RoverController
     {
        private:
+        /* our state model(IMU's state model)
+             +----------+
+             |         *| RST   PITCH  ROLL  HEADING
+         ADR |*        *| SCL
+         INT |*        *| SDA     ^            /->
+         PS1 |*        *| GND     |            |
+         PS0 |*        *| 3VO     Y    X(Z)-->    \-Z(X)
+             |         *| VIN
+             +----------+
+        */
+        imu::Vector<2> position;
+        imu::Vector<2> velocity;
+        imu::Vector<2> acceleration;
+        imu::Vector<2> w_theta_dot;  // [left wheel velocity, right wheel velocity]
 
+        imu::Vector<3> q_dot;  //[x, y, theta], the state model of Rover
+        int dt;                // (ms)
        public:
-        RoverController();
+        imu::Vector<3> q;  //[x, y, theta], the state model of Rover
+        RoverController(int dt);
 
-        
+        /**
+         * @brief
+         * Update the Rover state model q
+         */
+        void RoverControllerUpdate(imu::Vector<3> linear_accel,
+                                   imu::Vector<3> orientation, imu::Vector<3> euler);
         /**
          * @brief Processes the passed speed and angle and returns the values passed to
          * the dc motors
@@ -64,7 +88,6 @@ namespace controller
          */
         static double HeadingController(std::pair<double, double> src,
                                         std::pair<double, double> dest);
-
-
+        void Debug();
     };
 }  // namespace controller

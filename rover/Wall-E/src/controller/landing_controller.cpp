@@ -19,8 +19,7 @@ namespace controller
     {
         return (src < val + limit) && (src > val - limit);
     }
-    void LandingController::LandingDetectionUpdate(double accelx, double accely,
-                                                   double accelz)
+    void LandingController::LandingDetectionUpdate(imu::Vector<3> input)
     {
         if (landed)
         {
@@ -29,7 +28,7 @@ namespace controller
         }
 
         // Update the queue
-        linear_accel_history.push_back(imu::Vector<3>(accelx, accely, accelz));
+        linear_accel_history.push_back(input);
         linear_accel_history.pop_front();
 
         // Update avarage
@@ -76,7 +75,7 @@ namespace controller
         Serial.printf("[Landing]\n =============\n");
         Serial.printf("avg x: %f, y: %f, z: %f\n", average.x(), average.y(), average.z());
         Serial.printf("Elapsed time: %f\n", (millis() - start_time) / 1000.0);
-        Serial.printf("Landing time: %f\n", (end_time - start_time) / 1000.0);
+        Serial.printf("Landing time: %f\n=========\n", (end_time - start_time) / 1000.0);
     }
 
     void LandingController::Start()

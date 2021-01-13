@@ -9,7 +9,7 @@
  *
  */
 #pragma once
-#include <Adafruit_BNO055.h>
+#include <utility/imumaths.h>
 
 #include <deque>
 namespace controller
@@ -32,7 +32,7 @@ namespace controller
          * @todo complete function signature.
          *
          */
-        void LandingDetectionUpdate(double accelx, double accely, double accelz);
+        void LandingDetectionUpdate(imu::Vector<3> input);
 
         /**
          * @brief Return landing status

@@ -78,21 +78,21 @@ namespace sensor
              *
              * @return std::tuple<double, double, double>
              */
-            std::tuple<double, double, double> GetAccelVector();
+            imu::Vector<3> GetAccelVector();
 
             /**
              * @brief Return the Euler. Not including the gravity.
              *
              * @return std::tuple<double, double, double>
              */
-            std::tuple<double, double, double> GetOrientationAccelVector();
+            imu::Vector<3> GetOrientationAccelVector();
 
             /**
              * @brief Get the Euler Vector object
-             * 
-             * @return std::tuple<double, double, double> 
+             *
+             * @return std::tuple<double, double, double>
              */
-            std::tuple<double, double, double> GetEulerVector();
+            imu::Vector<3> GetEulerVector();
         };
     }  // namespace compass
 

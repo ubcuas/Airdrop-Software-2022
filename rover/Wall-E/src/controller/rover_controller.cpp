@@ -1,14 +1,23 @@
 #include "controller/rover_controller.h"
 
 #include <constants.h>
+#include <math.h>
 #include <pin_assignment.h>
 #include <sensor/gps_coordinate.h>
 
-
 namespace controller
 {
-    RoverController::RoverController() {}
+    RoverController::RoverController(int dt) : dt(dt), q(imu::Vector<3>(0, 0, 0)) {}
 
+    void RoverController::RoverControllerUpdate(imu::Vector<3> linear_accel,
+                                                imu::Vector<3> orientation,
+                                                imu::Vector<3> euler)
+    {
+        // euler is (Yaw, Roll, Pitch)
+        q[0] += linear_accel.y() * 0.5 * pow((double)(dt)/1000.0, 2) ;
+        q[1] += linear_accel.x() * 0.5 * pow((double)(dt)/1000.0, 2) ;
+        q[2] = euler.x();
+    }
     std::pair<double, double> RoverController::MotorController(int throttle,
                                                                int turn_angle)
     {
@@ -59,5 +68,14 @@ namespace controller
                                                                  dest.first, dest.second);
 
         return (turn_angle - 180);
+    }
+
+    void RoverController::Debug()
+    {
+        Serial.printf("[State model]\n========== \n");
+        Serial.printf("(x: %.3f m, y: %.3f m, theta: %f degree)\n", q[0], q[1], q[2]);
+        Serial.printf("");
+        Serial.printf("");
+        Serial.printf("");
     }
 }  // namespace controller

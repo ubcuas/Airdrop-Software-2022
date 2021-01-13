@@ -62,9 +62,11 @@ namespace sensor
             Serial.printf("[Compass] \n=================\n");
             Serial.printf("Current heading: %f\n", current_heading);
             imu::Vector<3> data = bno055.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
-            Serial.printf("linear accel: x: %f, y: %f, z: %f\n", data[0], data[1], data[2]);
+            Serial.printf("linear accel: x: %f, y: %f, z: %f\n", data[0], data[1],
+                          data[2]);
             data = bno055.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
-            Serial.printf("orientation: x: %f, y: %f, z: %f\n", data[0], data[1], data[2]);
+            Serial.printf("orientation: x: %f, y: %f, z: %f\n", data[0], data[1],
+                          data[2]);
             data = bno055.getVector(Adafruit_BNO055::VECTOR_EULER);
             Serial.printf("euler: x: %f, y: %f, z: %f\n", data[0], data[1], data[2]);
             Serial.println("=================");
@@ -75,25 +77,19 @@ namespace sensor
             return current_heading;
         }
 
-        std::tuple<double, double, double> BNO055Compass::GetAccelVector()
+        imu::Vector<3> BNO055Compass::GetAccelVector()
         {
-            imu::Vector<3> data = bno055.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
-
-            return std::make_tuple(data[0], data[1], data[2]);
+            return bno055.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
         }
 
-        std::tuple<double, double, double> BNO055Compass::GetOrientationAccelVector()
+        imu::Vector<3> BNO055Compass::GetOrientationAccelVector()
         {
-            imu::Vector<3> data = bno055.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
-
-            return std::make_tuple(data[0], data[1], data[2]);
+            return bno055.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
         }
 
-        std::tuple<double, double, double> BNO055Compass::GetEulerVector()
+        imu::Vector<3> BNO055Compass::GetEulerVector()
         {
-            imu::Vector<3> data = bno055.getVector(Adafruit_BNO055::VECTOR_EULER);
-
-            return std::make_tuple(data[0], data[1], data[2]);
+            return bno055.getVector(Adafruit_BNO055::VECTOR_EULER);
         }
 
     }  // namespace compass
