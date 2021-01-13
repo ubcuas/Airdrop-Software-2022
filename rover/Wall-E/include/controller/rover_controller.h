@@ -9,12 +9,8 @@
  * @copyright Copyright (c) 2021
  *
  */
-#include <Adafruit_BNO055.h>
-#include <constants.h>
-#include <sensor/gps_coordinate.h>
 
-#include <deque>
-#include <queue>
+#include <constants.h>
 #include <tuple>
 
 namespace controller
@@ -22,28 +18,11 @@ namespace controller
     class RoverController
     {
        private:
-        bool final_arrived;
-        bool waypoints_created;
-        bool landed;
-        imu::Vector<3> average;
-        std::deque<bool> landing_status_state;
-
-        sensor::gps::GPSCoordinate FINAL_WAYPOINT = sensor::gps::GPSCoordinate(
-            estimation::DEFAULT_FINAL_LATITUDE, estimation::DEFAULT_FINAL_LONGITUDE);
-
-        std::queue<sensor::gps::GPSCoordinate> intermediate_waypoints;
-
-        double distance_threshold;
-
-        bool WithinLimit(double src, double val, double limit) const;
 
        public:
         RoverController();
 
-        bool FinalArrived() const;
-        void CreateWaypoint(std::pair<double, double> src);
-        std::pair<double, double> UpdateWaypoint(std::pair<double, double> src);
-
+        
         /**
          * @brief Processes the passed speed and angle and returns the values passed to
          * the dc motors
@@ -77,16 +56,6 @@ namespace controller
                                                         std::pair<double, double> dest);
 
         /**
-         * @brief Landing detection algorithm. Takes input from
-         *
-         * @todo complete function signature.
-         *
-         */
-        void LandingDetectionUpdate(double accelx, double accely, double accelz);
-
-        bool GetLandingStatus() const;
-
-        /**
          * Calculates the necessary turn angle / heading difference between the target
          * heading and current heading
          * @param src  the current gps coordinate
@@ -96,17 +65,6 @@ namespace controller
         static double HeadingController(std::pair<double, double> src,
                                         std::pair<double, double> dest);
 
-        /**
-         * Determines if the rover is close enough to the target location
-         * @param src the current rover coordinate
-         * @param dest the target rover coordinate
-         * @param distance_threshold the maximum allowable distance to be considered close
-         * enough
-         * @returns true if the distance between the coordinates is less than the
-         * distance_threshold
-         */
-        static bool ReachedWaypoint(std::pair<double, double> src,
-                                    std::pair<double, double> dest,
-                                    double distance_threshold);
+
     };
 }  // namespace controller

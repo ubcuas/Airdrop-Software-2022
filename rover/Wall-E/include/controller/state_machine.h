@@ -20,6 +20,8 @@
 
 #include <memory>
 
+#include "controller/landing_controller.h"
+#include "controller/planning.h"
 #include "controller/rover_controller.h"
 
 #define STATE_MACHINE_DEBUG true
@@ -47,7 +49,8 @@ namespace controller
         // objects that won't be shared
         display::OLED* rover_oled;
         controller::RoverController* rover_controller;
-
+        controller::LandingController* landing_controller;
+        controller::Planning* planning;
         AutoState current_state;
 
         void ManualStateMachine();

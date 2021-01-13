@@ -6,6 +6,7 @@ namespace controller
 {
     StateMachine::StateMachine()
     {
+        // device initialization
         rover_compass = new compass::BNO055Compass("bno055");
         rover_gps     = new gps::AdafruitUltimateGPS("gps");
         ppm_rc        = new rc::PPMReceiver("ppm rc receiver");
@@ -14,9 +15,14 @@ namespace controller
         drop_servo  = new servo::Servo("servo");
         rover_barometer =
             new barometer::BMP280Barometer(barometer::LogicMode::I2C, "barometer");
+        rover_oled = new display::OLED();
 
-        rover_controller = new controller::RoverController();
-        rover_oled       = new display::OLED();
+        // controller initialization
+        rover_controller   = new controller::RoverController();
+        landing_controller = new controller::LandingController();
+        planning           = new controller::Planning();
+
+
 
         rover_compass->Attach();
         rover_gps->Attach();
@@ -126,11 +132,11 @@ namespace controller
                 break;
             case AutoState::LAND:
             {
-                if (!rover_controller->GetLandingStatus())
+                if (!landing_controller->GetLandingStatus())
                 {
                     double accelx, accely, accelz;
                     std::tie(accelx, accely, accelz) = rover_compass->GetAccelVector();
-                    rover_controller->LandingDetectionUpdate(accelx, accely, accelz);
+                    landing_controller->LandingDetectionUpdate(accelx, accely, accelz);
                 }
                 else
                 {
@@ -142,17 +148,17 @@ namespace controller
             {
                 if (!rover_gps->WaitForGPSConnection())
                 {
-                    rover_controller->CreateWaypoint(
+                    planning->CreateWaypoint(
                         rover_gps->GetCurrentGPSCoordinate());
                 }
-                if (!rover_controller->FinalArrived())
+                if (!planning->FinalArrived())
                 {
                     // TODO: make the rover focus on going straight from waypoint to
                     // waypoint, instead depend on GPS corrdiante. update the current
                     // controller
                     auto current_coordinate = rover_gps->GetCurrentGPSCoordinate();
                     auto target_coordinate =
-                        rover_controller->UpdateWaypoint(current_coordinate);
+                        planning->UpdateWaypoint(current_coordinate);
                     auto auto_result = controller::RoverController::AutoController(
                         current_coordinate, target_coordinate);
                     auto motor_result = controller::RoverController::MotorController(
