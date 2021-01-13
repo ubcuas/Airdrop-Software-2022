@@ -1,12 +1,12 @@
 /**
  * @file state_machine.h
  * @author your name (you@domain.com)
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2021-01-12
- * 
+ *
  * @copyright Copyright (c) 2021
- * 
+ *
  */
 #pragma once
 #include <actuator/dc_motor.h>
@@ -36,17 +36,17 @@ namespace controller
     class StateMachine
     {
        private:
-        std::shared_ptr<sensor::gps::AdafruitUltimateGPS> rover_gps;
-        std::shared_ptr<sensor::compass::BNO055Compass> rover_compass;
-        std::shared_ptr<sensor::rc::PPMReceiver> ppm_rc;
-        std::shared_ptr<actuator::motor::DCMotor> left_motor;
-        std::shared_ptr<actuator::motor::DCMotor> right_motor;
-        std::shared_ptr<actuator::servo::Servo> drop_servo;
-        std::shared_ptr<sensor::barometer::BMP280Barometer> rover_barometer;
-        
+        sensor::gps::AdafruitUltimateGPS* rover_gps;
+        sensor::compass::BNO055Compass* rover_compass;
+        sensor::rc::PPMReceiver* ppm_rc;
+        actuator::motor::DCMotor* left_motor;
+        actuator::motor::DCMotor* right_motor;
+        actuator::servo::Servo* drop_servo;
+        sensor::barometer::BMP280Barometer* rover_barometer;
+
         // objects that won't be shared
-        display::OLED rover_oled;
-        controller::RoverController rover_controller;
+        display::OLED* rover_oled;
+        controller::RoverController* rover_controller;
 
         AutoState current_state;
 
@@ -62,5 +62,6 @@ namespace controller
         void ControlUpdate();
         void StateMachineUpdate();
         void LEDUpdate();
+        void Debug();
     };
 }  // namespace controller

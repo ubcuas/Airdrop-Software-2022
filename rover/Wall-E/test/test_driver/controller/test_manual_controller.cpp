@@ -1,8 +1,8 @@
 #include "test_manual_controller.h"
 
 #include <Arduino.h>
-#include <unity.h>
 #include <constants.h>
+#include <unity.h>
 
 namespace test
 {
@@ -36,7 +36,7 @@ namespace test
         TEST_ASSERT_EQUAL(result.second, 0);
     }
 
-     void TestManualController::TestOutOfBounds()
+    void TestManualController::TestOutOfBounds()
     {
         auto result = controller::RoverController::MotorController(5, 360);
         TEST_ASSERT_EQUAL(result.first, 0);

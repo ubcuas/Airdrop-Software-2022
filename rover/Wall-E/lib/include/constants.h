@@ -6,13 +6,13 @@ namespace timing
     const static int ESTIMATION_TASK_MS = 250;
     const static int FAST_TASK_MS       = 10;
 
-    const static int SLOW_TASK_MS = 100;
+    const static int SLOW_TASK_MS = 150;
 
     const static int GPS_IDLE_MS = 1000;
 
     const static int GPS_TRACKING_MS = 1;
 
-    const static int STATE_TASK_MS = 500;
+    const static int STATE_TASK_MS = 600;
 }  // namespace timing
 
 namespace estimation

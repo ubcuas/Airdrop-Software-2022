@@ -6,19 +6,17 @@ namespace controller
 {
     StateMachine::StateMachine()
     {
-        rover_compass   = std::make_shared<compass::BNO055Compass>("bno055");
-        rover_gps       = std::make_shared<gps::AdafruitUltimateGPS>("gps");
-        ppm_rc          = std::make_shared<rc::PPMReceiver>("ppm rc receiver");
-        left_motor      = std::make_shared<motor::DCMotor>("left_motor",
-                                                      motor::MotorMapping::LEFT_MOTOR);
-        right_motor     = std::make_shared<motor::DCMotor>("right_motor",
-                                                       motor::MotorMapping::RIGHT_MOTOR);
-        drop_servo      = std::make_shared<servo::Servo>("servo");
-        rover_barometer = std::make_shared<barometer::BMP280Barometer>(
-            barometer::LogicMode::I2C, "barometer");
+        rover_compass = new compass::BNO055Compass("bno055");
+        rover_gps     = new gps::AdafruitUltimateGPS("gps");
+        ppm_rc        = new rc::PPMReceiver("ppm rc receiver");
+        left_motor    = new motor::DCMotor("left_motor", motor::MotorMapping::LEFT_MOTOR);
+        right_motor = new motor::DCMotor("right_motor", motor::MotorMapping::RIGHT_MOTOR);
+        drop_servo  = new servo::Servo("servo");
+        rover_barometer =
+            new barometer::BMP280Barometer(barometer::LogicMode::I2C, "barometer");
 
-        rover_controller = controller::RoverController();
-        rover_oled       = display::OLED();
+        rover_controller = new controller::RoverController();
+        rover_oled       = new display::OLED();
 
         rover_compass->Attach();
         rover_gps->Attach();
@@ -74,10 +72,29 @@ namespace controller
             Serial.println("done\n");
     }
     void StateMachine::CheckConnection() {}
-    void StateMachine::SlowUpdate() {}
-    void StateMachine::FastUpdate() {}
+    void StateMachine::SlowUpdate()
+    {
+        rover_barometer->Update();
+        rover_compass->Update();
+    }
+    void StateMachine::FastUpdate()
+    {
+        rover_gps->Read();
+    }
     void StateMachine::ControlUpdate()
     {
+        rover_gps->Update();
+        // left_motor->Update();
+        // right_motor->Update();
+        // drop_servo->Update();
+    }
+    void StateMachine::LEDUpdate() {}
+    void StateMachine::Debug()
+    {
+        rover_barometer->Debug();
+        rover_compass->Debug();
+        rover_gps->Debug();
+
         display::oled_dict data;
         data.heading   = rover_compass->GetHeading();
         data.latitude  = rover_gps->GetCurrentGPSCoordinate().first;
@@ -85,7 +102,7 @@ namespace controller
         data.altitude  = rover_barometer->GetAltitude();
 
         // Serial.printf("[Count]: %ld\n", count);
-        rover_oled.displayDebugMessage(&data);
+        rover_oled->displayDebugMessage(&data);
     }
     void StateMachine::ManualStateMachine()
     {
@@ -109,11 +126,11 @@ namespace controller
                 break;
             case AutoState::LAND:
             {
-                if (!rover_controller.GetLandingStatus())
+                if (!rover_controller->GetLandingStatus())
                 {
                     double accelx, accely, accelz;
                     std::tie(accelx, accely, accelz) = rover_compass->GetAccelVector();
-                    rover_controller.LandingDetectionUpdate(accelx, accely, accelz);
+                    rover_controller->LandingDetectionUpdate(accelx, accely, accelz);
                 }
                 else
                 {
@@ -125,16 +142,17 @@ namespace controller
             {
                 if (!rover_gps->WaitForGPSConnection())
                 {
-                    rover_controller.CreateWaypoint(rover_gps->GetCurrentGPSCoordinate());
+                    rover_controller->CreateWaypoint(
+                        rover_gps->GetCurrentGPSCoordinate());
                 }
-                if (!rover_controller.FinalArrived())
+                if (!rover_controller->FinalArrived())
                 {
                     // TODO: make the rover focus on going straight from waypoint to
                     // waypoint, instead depend on GPS corrdiante. update the current
                     // controller
                     auto current_coordinate = rover_gps->GetCurrentGPSCoordinate();
                     auto target_coordinate =
-                        rover_controller.UpdateWaypoint(current_coordinate);
+                        rover_controller->UpdateWaypoint(current_coordinate);
                     auto auto_result = controller::RoverController::AutoController(
                         current_coordinate, target_coordinate);
                     auto motor_result = controller::RoverController::MotorController(

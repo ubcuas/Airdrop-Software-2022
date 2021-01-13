@@ -6,65 +6,60 @@
 
 #include "controller/state_machine.h"
 
-controller::StateMachine stateMachine;
+controller::StateMachine* state_machine;
 
 MUTEX_DECL(dataMutex);
 
-static THD_WORKING_AREA(GPSThread, 1024);
+static THD_WORKING_AREA(FAST_THREAD, 1024);
 
 static THD_FUNCTION(Thread0, arg)
 {
     (void)arg;  // avoid warning on unused parameters.
     while (true)
     {
-        // rover_gps->Read();
-        stateMachine.FastUpdate();
+        state_machine->FastUpdate();
         chThdSleepMilliseconds(timing::GPS_TRACKING_MS);
     }
 }
 
-static THD_WORKING_AREA(EstimationThread, 1024);
+static THD_WORKING_AREA(CONTROL_THREAD, 1024);
 
 static THD_FUNCTION(Thread1, arg)
 {
     (void)arg;  // avoid warning on unused parameters.
     while (true)
     {
-        // rover_gps->Update();
-        stateMachine.SlowUpdate();
-        chThdSleepMilliseconds(timing::STATE_TASK_MS);
+        state_machine->ControlUpdate();
+        chThdSleepMilliseconds(timing::ESTIMATION_TASK_MS);
     }
 }
 
-static THD_WORKING_AREA(SlowThread, 1024);
+static THD_WORKING_AREA(SLOW_THREAD, 1024);
 
 static THD_FUNCTION(Thread2, arg)
 {
     (void)arg;  // avoid warning on unused parameters.
     while (true)
     {
-        stateMachine.ControlUpdate();  // rover_compass->Update();
-        // rover_barometer->Update();
+        state_machine->SlowUpdate();
         // TODO: figure out motor update frequency
-        // left_motor->Update();
-        // right_motor->Update();
-        // drop_servo->Update();
+
         chThdSleepMilliseconds(timing::SLOW_TASK_MS);
     }
 }
 
 void chSetup()
 {
-    chThdCreateStatic(GPSThread, sizeof(GPSThread), HIGHPRIO, Thread0, NULL);
-    chThdCreateStatic(EstimationThread, sizeof(EstimationThread), LOWPRIO, Thread1, NULL);
-    chThdCreateStatic(SlowThread, sizeof(SlowThread), NORMALPRIO, Thread2, NULL);
+    chThdCreateStatic(FAST_THREAD, sizeof(FAST_THREAD), HIGHPRIO, Thread0, NULL);
+    chThdCreateStatic(CONTROL_THREAD, sizeof(CONTROL_THREAD), LOWPRIO, Thread1, NULL);
+    chThdCreateStatic(SLOW_THREAD, sizeof(SLOW_THREAD), NORMALPRIO, Thread2, NULL);
 }
 
 void setup()
 {
     Serial.begin(115200);
 
-    stateMachine = controller::StateMachine();
+    state_machine = new controller::StateMachine();
 
     chBegin(chSetup);
 
@@ -73,16 +68,11 @@ void setup()
     }
 }
 
-
 uint32_t count = 0;
 
 void loop()
 {
-    // rover_barometer->Debug();
-    // rover_compass->Debug();
-    // rover_gps->Debug();
-    // count += 1;
-    chThdSleepMilliseconds(1000);
-
-    
+    // state_machine->StateMachineUpdate();
+    state_machine->Debug();
+    chThdSleepMilliseconds(timing::STATE_TASK_MS);
 }
