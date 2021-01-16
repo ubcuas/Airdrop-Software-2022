@@ -37,6 +37,20 @@ namespace controller
 
         imu::Vector<3> q_dot;  //[x, y, theta], the state model of Rover
         int dt;                // (ms)
+        double last_error;
+        double error_sum;
+
+        /**
+         * @brief Correct the error angle. Since heading is between 0-360, there are some
+         * edge cases where the angle roll over 360 
+         *
+         * @param current_heading raw heading from sensor
+         * @param turn_angle desired/input heading
+         * @return double corrected error heading
+         */
+        double PIDErrorCorrection(double current_heading, double turn_angle);
+
+
        public:
         imu::Vector<3> q;  //[x, y, theta], the state model of Rover
         RoverController(int dt);
@@ -50,14 +64,11 @@ namespace controller
         /**
          * @brief Processes the passed speed and angle and returns the values passed to
          * the dc motors
-         * @param throttle 0 <= x <= 100
-         * @param turn_angle angle to turn (-180 <= x <= 180)
-         *                   Right: 0 < x <= 180
-         *                   Left: -180 <= x < 0
+         * @param input data pair of throttle value and turn angle (-180 to 180) degree
          * @returns a pair of values passed to the dc motors that will achieve the effect
          * described by the passed arguments
          */
-        static std::pair<double, double> MotorController(int throttle, int turn_angle);
+        static std::pair<double, double> MotorController(std::pair<double, double> input);
 
         /**
          * @brief Manual mode: Converts the RC stick values to corresponding throttle and
@@ -70,24 +81,18 @@ namespace controller
         static std::pair<double, double> RCController(int throttle_value, int yaw_value);
 
         /**
-         * @brief Auto mode: Determines the necessary speed and turn angle given a current
-         * and target location
-         * @param src latitude and longitude of the current location
-         * @param dest latitude and longitude of the target location
-         * @returns a pair of values representing the necessary speed and turn angle
-         */
-        static std::pair<double, double> AutoController(std::pair<double, double> src,
-                                                        std::pair<double, double> dest);
-
-        /**
          * Calculates the necessary turn angle / heading difference between the target
          * heading and current heading
          * @param src  the current gps coordinate
          * @param dest the target gps coordinate
-         * @returns the angle
+         * @param heading the current heading (0-360) degree
+         * @returns data pair of throttle value and turn angle (-180 to 180) degree
          */
-        static double HeadingController(std::pair<double, double> src,
-                                        std::pair<double, double> dest);
+        std::pair<double, double> HeadingPIDController(std::pair<double, double> src,
+                                                       std::pair<double, double> dest,
+                                                       double current_heading);
+
+
         void Debug();
     };
 }  // namespace controller

@@ -13,19 +13,33 @@ namespace timing
 
 namespace estimation
 {
-    const static double DEFAULT_GPS_LATITUDE            = 0;
-    const static double DEFAULT_GPS_LONGITUDE           = 0;
-    const static double DEFAULT_FINAL_LATITUDE          = 0;
-    const static double DEFAULT_FINAL_LONGITUDE         = 0;
+    const static double DEFAULT_GPS_LATITUDE  = 0;
+    const static double DEFAULT_GPS_LONGITUDE = 0;
+
+    // The goal GPS coordinate
+    const static double DEFAULT_FINAL_LATITUDE  = 0;
+    const static double DEFAULT_FINAL_LONGITUDE = 0;
+
+    // The default drop location
+    const static double DEFAULT_DROP_LATITUDE  = 0;
+    const static double DEFAULT_DROP_LONGITUDE = 0;
+
     const static double INTERMEDIATE_WAYPOINT_THRESHOLD = 5;  // m
     const static double FINAL_WAYPOINT_THRESHOLD        = 1;  // m
     const static int WAYPOINT_NUMBER                    = 10;
+
+    const static double KP = 1;
+    const static double KI = 0;
+    const static double KD = 0;
+
+    const static double I_MAX = 90;
+    const static double I_MIN = -90;
 
     // landing controller
     // TODO: calibrate for these numbers
     // delay = ESTIMATION_TASK_MS * LANDING_DETECTION_HISTORY_LENGTH / 1000 (s)
     const static int LANDING_DETECTION_HISTORY_LENGTH = 100;
-    const static double LANDING_ACCEL_THRESH          = 0.5;
+    const static double LANDING_ACCEL_THRESH          = 0.7;
     const static double LANDING_ACCEL_HISTORY_THRESH  = 1.0;
 
     const static double DELTA_HEIGHT_THRESHOLD        = 30;

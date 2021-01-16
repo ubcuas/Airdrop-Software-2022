@@ -29,10 +29,7 @@ namespace controller
                 estimation::DEFAULT_FINAL_LATITUDE, estimation::DEFAULT_FINAL_LONGITUDE));
         }
     }
-    bool Planning::FinalArrived() const
-    {
-        return final_arrived;
-    }
+
     std::pair<double, double> Planning::UpdateWaypoint(std::pair<double, double> src)
     {
         sensor::gps::GPSCoordinate next_waypoint = (intermediate_waypoints.size() > 0)

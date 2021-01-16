@@ -55,6 +55,9 @@ namespace controller
         controller::LandingController* landing_controller;
         controller::Planning* planning;
         AutoState current_state;
+        std::pair<double, double> motor_result;
+        std::pair<double, double> current_coordinate;
+        std::pair<double, double> target_coordinate;
 
         void ManualStateMachine();
         void AutoStateMachine();

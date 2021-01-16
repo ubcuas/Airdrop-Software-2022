@@ -8,7 +8,6 @@ namespace controller
     class Planning
     {
        private:
-        bool final_arrived;
         bool waypoints_created;
         sensor::gps::GPSCoordinate FINAL_WAYPOINT = sensor::gps::GPSCoordinate(
             estimation::DEFAULT_FINAL_LATITUDE, estimation::DEFAULT_FINAL_LONGITUDE);
@@ -18,10 +17,26 @@ namespace controller
         double distance_threshold;
 
        public:
+        bool final_arrived;
+
         Planning();
         bool FinalArrived() const;
+
+        /**
+         * @brief Create a Waypoint object
+         *
+         * @param src
+         */
         void CreateWaypoint(std::pair<double, double> src);
+
+        /**
+         * @brief refresh the way point array.
+         *
+         * @param src
+         * @return std::pair<double, double>
+         */
         std::pair<double, double> UpdateWaypoint(std::pair<double, double> src);
+
         /**
          * Determines if the rover is close enough to the target location
          * @param src the current rover coordinate
