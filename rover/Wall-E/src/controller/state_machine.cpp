@@ -87,16 +87,19 @@ namespace controller
         rover_compass->Update();
 
         landing_controller->LandingDetectionUpdate(rover_compass->GetAccelVector());
+
         rover_controller->RoverControllerUpdate(
             rover_compass->GetAccelVector(), rover_compass->GetOrientationAccelVector(),
             rover_compass->GetEulerVector());
 
-
         auto auto_result = rover_controller->HeadingPIDController(
             current_coordinate, target_coordinate, rover_compass->GetHeading());
         motor_result = controller::RoverController::MotorController(auto_result);
-        left_motor->ChangeInput(motor_result.first);
-        right_motor->ChangeInput(motor_result.second);
+        if (current_state == AutoState::DRIVE)
+        {
+            left_motor->ChangeInput(motor_result.first);
+            right_motor->ChangeInput(motor_result.second);
+        }
     }
 
     void StateMachine::FastUpdate()
@@ -127,7 +130,7 @@ namespace controller
         data.longitude = motor_result.second;
         data.altitude  = rover_barometer->GetAltitude();
         data.state     = auto_state_name[current_state];
-        // Serial.printf("[Count]: %ld\n", count);
+
         rover_oled->displayDebugMessage(&data);
     }
     void StateMachine::ManualStateMachine()
@@ -145,6 +148,8 @@ namespace controller
         {
             // TODO: communication between winch and rover for dropping
             case AutoState::IDLE:
+                left_motor->StopMotor();
+                right_motor->StopMotor();
                 current_state = AutoState::DROP;
                 break;
             case AutoState::DROP:
@@ -184,7 +189,8 @@ namespace controller
 
                     // check if we have arrived or not, in GPS denied environment
 
-                    if (abs(rover_controller->q[0]) > 1 || abs(rover_controller->q[1]) > 1)
+                    if (abs(rover_controller->q[0]) > 1 ||
+                        abs(rover_controller->q[1]) > 1)
                     {
                         planning->final_arrived = true;
                     }

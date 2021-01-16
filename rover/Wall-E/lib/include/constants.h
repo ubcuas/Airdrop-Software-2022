@@ -28,7 +28,7 @@ namespace estimation
     const static double FINAL_WAYPOINT_THRESHOLD        = 1;  // m
     const static int WAYPOINT_NUMBER                    = 10;
 
-    const static double KP = 1;
+    const static double KP = 2;
     const static double KI = 0;
     const static double KD = 0;
 
