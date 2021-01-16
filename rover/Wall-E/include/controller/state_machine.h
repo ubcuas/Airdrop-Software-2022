@@ -59,18 +59,62 @@ namespace controller
         std::pair<double, double> current_coordinate;
         std::pair<double, double> target_coordinate;
 
+        /**
+         * @brief 
+         * 
+         */
         void ManualStateMachine();
+
+        /**
+         * @brief 
+         * 
+         */
         void AutoStateMachine();
 
        public:
         StateMachine();
+        /**
+         * @brief 
+         * 
+         */
         void Calibration();
+
+        /**
+         * @brief 
+         * 
+         */
         void CheckConnection();
+
+        /**
+         * @brief 
+         * 
+         */
         void SlowUpdate();
+
+        /**
+         * @brief 
+         * 
+         */
         void FastUpdate();
+
+        /**
+         * @brief 
+         * 
+         */
         void ControlUpdate();
+
+        /**
+         * @brief 
+         * 
+         */
         void StateMachineUpdate();
+
+        /**
+         * @brief 
+         * 
+         */
         void LEDUpdate();
+        
         void Debug();
     };
 }  // namespace controller

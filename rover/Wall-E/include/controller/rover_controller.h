@@ -42,7 +42,7 @@ namespace controller
 
         /**
          * @brief Correct the error angle. Since heading is between 0-360, there are some
-         * edge cases where the angle roll over 360 
+         * edge cases where the angle roll over 360
          *
          * @param current_heading raw heading from sensor
          * @param turn_angle desired/input heading
@@ -56,8 +56,7 @@ namespace controller
         RoverController(int dt);
 
         /**
-         * @brief
-         * Update the Rover state model q
+         * @brief Update the Rover state model q
          */
         void RoverControllerUpdate(imu::Vector<3> linear_accel,
                                    imu::Vector<3> orientation, imu::Vector<3> euler);

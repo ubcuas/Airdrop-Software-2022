@@ -108,7 +108,6 @@ namespace controller
     }
     void StateMachine::ControlUpdate()
     {
-        rover_gps->Update();
         left_motor->Update();
         right_motor->Update();
         // drop_servo->Update();
@@ -211,6 +210,8 @@ namespace controller
     }
     void StateMachine::StateMachineUpdate()
     {
+        rover_gps->Update();
+
         if (ppm_rc->CheckConnection())
         {
             // TODO: the reset between states

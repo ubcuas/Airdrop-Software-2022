@@ -1,9 +1,13 @@
 #pragma once
 #include <Arduino.h>
 
+namespace config
+{
+    const static bool PERFORM_CALIBRATION = true;
+}
 namespace timing
 {
-    const static int ESTIMATION_TASK_MS = 250;
+    const static int ESTIMATION_TASK_MS = 100;
     const static int FAST_TASK_MS       = 1;
     const static int SLOW_TASK_MS       = 33;
     const static int GPS_IDLE_MS        = 1000;
@@ -28,9 +32,11 @@ namespace estimation
     const static double FINAL_WAYPOINT_THRESHOLD        = 1;  // m
     const static int WAYPOINT_NUMBER                    = 10;
 
-    const static double KP = 2;
+    // TODO: auto tune
+    // This PID is for throttle = 50
+    const static double KP = 0.7;
     const static double KI = 0;
-    const static double KD = 0;
+    const static double KD = 1;
 
     const static double I_MAX = 90;
     const static double I_MIN = -90;

@@ -70,17 +70,15 @@ namespace controller
         turn_angle = 0;
 
         // if 359 - 0, it's actually -1 but it will be 359 instead
-
-
         // angle alignment
         double aligned_heading =
             (current_heading > 180) ? (current_heading - 180) : (current_heading + 180);
         double error = PIDErrorCorrection(aligned_heading, turn_angle);
-        error_sum += dt * error;
+        error_sum += error;
         error_sum = constrain(error_sum, estimation::I_MIN, estimation::I_MAX);
 
         double output = estimation::KP * error + estimation ::KI * error_sum +
-                        -estimation::KD * (error - last_error);
+                        +estimation::KD * (error - last_error);
 
         output     = constrain(output, estimation::I_MIN, estimation::I_MAX);
         last_error = error;

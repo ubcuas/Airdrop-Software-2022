@@ -43,6 +43,11 @@ namespace controller
         bool GetLandingStatus() const;
 
         void Debug() const;
+        
+        /**
+         * @brief Debug purpose only: test how long the timing is.
+         * 
+         */
         void Start();
         void End();
     };
