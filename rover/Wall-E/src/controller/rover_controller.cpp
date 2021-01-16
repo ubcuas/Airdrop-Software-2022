@@ -1,95 +1,39 @@
 #include "controller/rover_controller.h"
 
 #include <constants.h>
+#include <math.h>
 #include <pin_assignment.h>
-
+#include <sensor/gps_coordinate.h>
 
 namespace controller
 {
-    RoverController::RoverController()
+    RoverController::RoverController(int dt)
+        : dt(dt),
+          q(imu::Vector<3>(0, 0, 0)),
+          last_error(0),
+          error_sum(0),
+          KP(estimation::DEFAULT_KP),
+          KI(estimation::DEFAULT_KI),
+          KD(estimation::DEFAULT_KD)
     {
-        final_arrived     = false;
-        waypoints_created = false;
-        landed            = false;
-        landing_status_state.resize(estimation::LANDING_DETECTION_HISTORY_LENGTH);
-        distance_threshold = estimation::INTERMEDIATE_WAYPOINT_THRESHOLD;
     }
 
-    void RoverController::CreateWaypoint(std::pair<double, double> src)
+    void RoverController::RoverControllerUpdate(imu::Vector<3> linear_accel,
+                                                imu::Vector<3> orientation,
+                                                imu::Vector<3> euler)
     {
-        if (!waypoints_created)
-        {
-            double distance = sensor::gps::GPSCoordinate::DistanceBetween(
-                src.first, src.second, FINAL_WAYPOINT.GetLatitude(),
-                FINAL_WAYPOINT.GetLongitude());
-            sensor::gps::GPSCoordinate current_location =
-                sensor::gps::GPSCoordinate(src.first, src.second);
-            double increment = distance / estimation::WAYPOINT_NUMBER;
-            for (double bearing = 0; bearing < distance; bearing += increment)
-            {
-                auto waypoint = sensor::gps::GPSCoordinate::GetIntermediatePoint(
-                    current_location, FINAL_WAYPOINT, bearing);
-                intermediate_waypoints.push(
-                    sensor::gps::GPSCoordinate(waypoint.first, waypoint.second));
-            }
-            intermediate_waypoints.push(sensor::gps::GPSCoordinate(
-                estimation::DEFAULT_FINAL_LATITUDE, estimation::DEFAULT_FINAL_LONGITUDE));
-        }
+        // euler is (Yaw, Roll, Pitch)
+        q[0] += linear_accel.y() * 0.5 * pow((double)(dt) / 1000.0, 2);
+        q[1] += linear_accel.x() * 0.5 * pow((double)(dt) / 1000.0, 2);
+        q[2] = euler.x();
     }
-    bool RoverController::FinalArrived() const
+    std::pair<double, double> RoverController::MotorController(
+        std::pair<double, double> input)
     {
-        return final_arrived;
-    }
-
-    std::pair<double, double> RoverController::UpdateWaypoint(
-        std::pair<double, double> src)
-    {
-        sensor::gps::GPSCoordinate next_waypoint = (intermediate_waypoints.size() > 0)
-                                                       ? intermediate_waypoints.front()
-                                                       : FINAL_WAYPOINT;
-        if (sensor::gps::GPSCoordinate::DistanceBetween(
-                src.first, src.second, next_waypoint.GetLatitude(),
-                next_waypoint.GetLongitude()) <= distance_threshold)
-        {
-            if (intermediate_waypoints.empty())
-            {
-                // the waypoint map is empty, thus we have arrived at the final waypoint.
-                final_arrived = true;
-                return std::make_pair(0, 0);
-            }
-            else
-            {
-                // remove the next waypoint
-                intermediate_waypoints.pop();
-                if (intermediate_waypoints.empty())
-                {
-                    // the next point is the final way point
-                    distance_threshold = estimation::FINAL_WAYPOINT_THRESHOLD;
-                    return std::make_pair(FINAL_WAYPOINT.GetLatitude(),
-                                          FINAL_WAYPOINT.GetLongitude());
-                }
-                else
-                {
-                    // update a new waypoint
-                    next_waypoint = intermediate_waypoints.front();
-                    return std::make_pair(next_waypoint.GetLatitude(),
-                                          next_waypoint.GetLongitude());
-                }
-            }
-        }
-        else
-        {
-            // keep going at the current waypoint
-            return std::make_pair(next_waypoint.GetLatitude(),
-                                  next_waypoint.GetLongitude());
-        }
-    }
-
-    std::pair<double, double> RoverController::MotorController(int throttle,
-                                                               int turn_angle)
-    {
-        double left  = throttle;
-        double right = throttle;
+        double throttle   = input.first;
+        double turn_angle = input.second;
+        double left       = throttle;
+        double right      = throttle;
 
         if (abs(turn_angle) > estimation::MOTOR_TURN_MIN_THRESH)
         {
@@ -119,84 +63,55 @@ namespace controller
 
         return std::make_pair(mappedSpeed, mappedAngle);
     }
-    std::pair<double, double> RoverController::AutoController(
-        std::pair<double, double> src, std::pair<double, double> dest)
+    std::pair<double, double> RoverController::HeadingPIDController(
+        std::pair<double, double> src, std::pair<double, double> dest,
+        double current_heading)
     {
-        double throttle = 100;
-        double turn_angle{HeadingController(src, dest)};
-
-        return std::make_pair(throttle, turn_angle);
-    }
-
-    double RoverController::HeadingController(std::pair<double, double> src,
-                                              std::pair<double, double> dest)
-    {
+        // TODO: check the distance to determine the throttle
+        double throttle   = 50;
         double turn_angle = sensor::gps::GPSCoordinate::CourseTo(src.first, src.second,
                                                                  dest.first, dest.second);
 
-        return (turn_angle - 180);
+        // NOTE: testing only
+        turn_angle = 0;
+
+        // if 359 - 0, it's actually -1 but it will be 359 instead
+        // angle alignment
+        double aligned_heading =
+            (current_heading > 180) ? (current_heading - 180) : (current_heading + 180);
+        double error = PIDErrorCorrection(aligned_heading, turn_angle);
+        error_sum += error;
+        error_sum = constrain(error_sum, estimation::I_MIN, estimation::I_MAX);
+
+        double output = KP * error + KI * error_sum + KD * (error - last_error);
+
+        output     = constrain(output, estimation::I_MIN, estimation::I_MAX);
+        last_error = error;
+        return std::make_pair(throttle, output);
     }
 
-    void RoverController::LandingDetectionUpdate(double accelx, double accely,
-                                                 double accelz)
+    double RoverController::PIDErrorCorrection(double current_heading, double turn_angle)
     {
-        if (landed)
+        if ((turn_angle < current_heading) && (current_heading - turn_angle > 180))
         {
-            return;
+            return (360 + turn_angle) - current_heading;
         }
-        // add to the average
-        if (WithinLimit(average.x(), accelx, estimation::LANDING_ACCEL_THRESH) &&
-            WithinLimit(average.y(), accely, estimation::LANDING_ACCEL_THRESH) &&
-            WithinLimit(average.z(), accelz, estimation::LANDING_ACCEL_THRESH))
+        else if ((current_heading < turn_angle) && (turn_angle - current_heading > 180))
         {
-            landing_status_state.push_back(true);
+            return turn_angle - (current_heading + 360);
         }
         else
         {
-            landing_status_state.push_back(false);
-        }
-        landing_status_state.pop_front();
-
-        // check if confirm landing
-        int count = 0;
-        for (bool val : landing_status_state)
-        {
-            if (val)
-            {
-                count += 1;
-            }
-        }
-
-        if ((count / estimation::LANDING_DETECTION_HISTORY_LENGTH) >
-            estimation::LANDING_STATUS_CONFIRM_THRESH)
-        {
-            landed = true;
-        }
-        else
-        {
-            // update average
-            average[0] =
-                (average[0] * (estimation::LANDING_DETECTION_HISTORY_LENGTH - 1) +
-                 accelx) /
-                estimation::LANDING_DETECTION_HISTORY_LENGTH;
-            average[1] =
-                (average[1] * (estimation::LANDING_DETECTION_HISTORY_LENGTH - 1) +
-                 accely) /
-                estimation::LANDING_DETECTION_HISTORY_LENGTH;
-            average[2] =
-                (average[2] * (estimation::LANDING_DETECTION_HISTORY_LENGTH - 1) +
-                 accelz) /
-                estimation::LANDING_DETECTION_HISTORY_LENGTH;
+            return turn_angle - current_heading;
         }
     }
 
-    bool RoverController::WithinLimit(double src, double val, double limit) const
+    void RoverController::Debug()
     {
-        return false;
+        Serial.printf("[State model]\n========== \n");
+        Serial.printf("(x: %.3f m, y: %.3f m, theta: %f degree)\n", q[0], q[1], q[2]);
+        Serial.printf("");
+        Serial.printf("");
+        Serial.printf("");
     }
-    bool RoverController::GetLandingStatus() const
-    {
-        return landed;
-    }
-
 }  // namespace controller

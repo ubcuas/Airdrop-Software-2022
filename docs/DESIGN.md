@@ -233,9 +233,9 @@ CheckMode --> LPM
 state AutoMode{
   [*] --> LandingDetection
   LandingDetection --> LandingDetection: false
-  LandingDetection --> HeadingController
-  HeadingController --> MotorController
-  MotorController --> HeadingController: not arrived
+  LandingDetection --> HeadingPIDController
+  HeadingPIDController --> MotorController
+  MotorController --> HeadingPIDController: not arrived
   MotorController --> [*]: arrived
 }
 
