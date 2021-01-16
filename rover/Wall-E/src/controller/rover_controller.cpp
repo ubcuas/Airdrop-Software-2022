@@ -8,7 +8,13 @@
 namespace controller
 {
     RoverController::RoverController(int dt)
-        : dt(dt), q(imu::Vector<3>(0, 0, 0)), last_error(0), error_sum(0)
+        : dt(dt),
+          q(imu::Vector<3>(0, 0, 0)),
+          last_error(0),
+          error_sum(0),
+          KP(estimation::DEFAULT_KP),
+          KI(estimation::DEFAULT_KI),
+          KD(estimation::DEFAULT_KD)
     {
     }
 
@@ -77,8 +83,7 @@ namespace controller
         error_sum += error;
         error_sum = constrain(error_sum, estimation::I_MIN, estimation::I_MAX);
 
-        double output = estimation::KP * error + estimation ::KI * error_sum +
-                        +estimation::KD * (error - last_error);
+        double output = KP * error + KI * error_sum + KD * (error - last_error);
 
         output     = constrain(output, estimation::I_MIN, estimation::I_MAX);
         last_error = error;

@@ -57,7 +57,7 @@ namespace sensor
             imu::Vector<3> gyr;
             imu::Vector<3> mag;
             double ACCEL_VEL_TRANSITION = timing::SLOW_TASK_MS / 1000.0;
-
+            uint8_t compass_calibration;
            public:
             using Sensor::Sensor;
 

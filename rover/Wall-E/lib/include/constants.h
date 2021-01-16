@@ -34,9 +34,9 @@ namespace estimation
 
     // TODO: auto tune
     // This PID is for throttle = 50
-    const static double KP = 0.7;
-    const static double KI = 0;
-    const static double KD = 1;
+    const static double DEFAULT_KP = 0.7;
+    const static double DEFAULT_KI = 0;
+    const static double DEFAULT_KD = 1;
 
     const static double I_MAX = 90;
     const static double I_MIN = -90;

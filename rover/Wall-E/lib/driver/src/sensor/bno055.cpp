@@ -45,21 +45,19 @@ namespace sensor
         bool BNO055Compass::Calibrate()
         {
             uint8_t system, gyro, accel, mg = 0;
-            bno055.getCalibration(&system, &gyro, &accel, &mg);
+            bno055.getCalibration(&system, &gyro, &accel, &compass_calibration);
 
-            Serial.print(this->sensor_name);
-            Serial.println(" Calibrate");
-            if ((system == 0) || (gyro == 0) || (accel == 0) || (mg == 0))
+            if ((system == 0) || (gyro == 0) || (accel == 0) || (compass_calibration == 0))
             {
                 return false;
             }
-
             return true;
         }
 
         void BNO055Compass::Debug()
         {
             Serial.printf("[Compass] \n=================\n");
+            Serial.printf("calibrate: %d\n", compass_calibration);
             Serial.printf("Current heading: %f\n", current_heading);
             imu::Vector<3> data = bno055.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
             Serial.printf("linear accel: x: %f, y: %f, z: %f\n", data[0], data[1],
