@@ -1,6 +1,5 @@
 /**
  * @file state_machine.h
- * @author your name (you@domain.com)
  * @brief
  * @version 0.1
  * @date 2021-01-12
@@ -27,12 +26,12 @@
 #define STATE_MACHINE_DEBUG true
 namespace controller
 {
-    // This is a very ugly way to map Enum to string. However, the alternative are
-    // unnecessarily complicated
+    // This is a very ugly and lame way to map Enum to string. However, the alternative
+    // are unnecessarily complicated
     const String auto_state_name[5] = {"IDLE", "DROP", "LAND", "DRIVE", "ARRIVED"};
     enum AutoState
     {
-        IDLE = 0,
+        IDLE,
         DROP,
         LAND,
         DRIVE,
@@ -60,61 +59,82 @@ namespace controller
         std::pair<double, double> target_coordinate;
 
         /**
-         * @brief 
-         * 
+         * @brief manually use RC to drive the rover around. It's also the fall back after
+         * manual take over in case of things go wrong
+         *
          */
         void ManualStateMachine();
 
         /**
-         * @brief 
-         * 
+         * @brief autonomous driving state machine.
+         *
          */
         void AutoStateMachine();
 
        public:
         StateMachine();
         /**
-         * @brief 
-         * 
+         * @brief calibration procedure
+         *
          */
         void Calibration();
 
         /**
-         * @brief 
-         * 
+         * @brief
+         *
          */
         void CheckConnection();
 
         /**
-         * @brief 
-         * 
+         * @brief We use time-driven system with a bit of event-driven within it's
+         * framework
+         *
+         * All the XXXUpdate() functions are called at certain frequency, namely at
+         * 1000 / XXX_TASK_MS Hz.
+         *
+         * Note that all the Update functions should not have Serial.print(), delay()  or
+         * any time consumping function.
+         */
+        /**
+         * @brief Slow sensor update
+         * IMU and barometer updates
          */
         void SlowUpdate();
 
         /**
-         * @brief 
-         * 
+         * @brief Fast sensor update
+         * The fast updating loop in the system. It's the GPS callback, as well XBee.
+         *
          */
         void FastUpdate();
 
         /**
-         * @brief 
-         * 
+         * @brief Actuator update.
+         * Since actuators such as motor takes time to get to the position that it's
+         * requested (in our case, relative speed). This time-driven update is depended on
+         * the slowest reponse time out of al actuators
+         *
+         * Since the bottole neck for estimation is the control loop, estimation callbacks
+         * should be included here as well
          */
         void ControlUpdate();
 
         /**
-         * @brief 
-         * 
+         * @brief State machien update
+         *
          */
         void StateMachineUpdate();
 
         /**
-         * @brief 
-         * 
+         * @brief LED controlling thread
+         * 1 blink every 2 seconds: IDLE
+         * 2 quick consecutive blink every 2 seconds: Landind detection
+         * 1 blink every 1 seconds: In Drive state, currently driving
+         * 2 quick consecutive blink every 1 second: In Drive state with GPS fix
+         * 3 blinks every 1 seconds: some sensor were disconnected
          */
         void LEDUpdate();
-        
+
         void Debug();
     };
 }  // namespace controller

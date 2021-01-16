@@ -30,7 +30,7 @@ static THD_FUNCTION(Thread1, arg)
     while (true)
     {
         state_machine->ControlUpdate();
-        chThdSleepMilliseconds(timing::ESTIMATION_TASK_MS);
+        chThdSleepMilliseconds(timing::CONTROL_TASK_MS);
     }
 }
 
@@ -56,7 +56,7 @@ static THD_FUNCTION(Thread3, arg)
     while (true)
     {
         state_machine->StateMachineUpdate();
-        chThdSleepMilliseconds(timing::STATE_TASK_MS);
+        chThdSleepMilliseconds(timing::STATE_MACHINE_TASK_MS);
     }
 }
 

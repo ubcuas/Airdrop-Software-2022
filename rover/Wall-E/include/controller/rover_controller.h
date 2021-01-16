@@ -40,6 +40,10 @@ namespace controller
         double last_error;
         double error_sum;
 
+        double KP;
+        double KI;
+        double KD;
+
         /**
          * @brief Correct the error angle. Since heading is between 0-360, there are some
          * edge cases where the angle roll over 360
