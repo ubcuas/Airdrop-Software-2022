@@ -1,120 +1,78 @@
 #include <Arduino.h>
 #include <ChRt.h>
-#include <actuator/dc_motor.h>
-#include <actuator/servo.h>
-#include <constants.h>
-#include <sensor/adafruit_ultimate_gps.h>
-#include <sensor/bno055.h>
-#include <sensor/ppm_receiver.h>
+#include <Wire.h>
 
 #include <tuple>
 
-#include "controller/rover_controller.h"
+#include "controller/state_machine.h"
 
-
-using namespace sensor;
-using namespace actuator;
-gps::AdafruitUltimateGPS* rover_gps;
-compass::BNO055Compass* rover_compass;
-rc::PPMReceiver* ppm_rc;
-motor::DCMotor* left_motor;
-motor::DCMotor* right_motor;
-servo::Servo* drop_servo;
-controller::RoverController* rover_controller;
-
-
-bool connected = true;
-bool led_state = false;
+controller::StateMachine* state_machine;
 
 MUTEX_DECL(dataMutex);
 
-static THD_WORKING_AREA(GPSThread, 200);
+static THD_WORKING_AREA(FAST_THREAD, 1024);
 
 static THD_FUNCTION(Thread0, arg)
 {
     (void)arg;  // avoid warning on unused parameters.
     while (true)
     {
-        if (connected)
-        {
-            // rover_gps->Read();
-            chThdSleepMilliseconds(timing::GPS_TRACKING_MS);
-        }
+        state_machine->FastUpdate();
+        chThdSleepMilliseconds(timing::GPS_TRACKING_MS);
     }
 }
 
-static THD_WORKING_AREA(EstimationThread, 200);
+static THD_WORKING_AREA(CONTROL_THREAD, 1024);
 
 static THD_FUNCTION(Thread1, arg)
 {
     (void)arg;  // avoid warning on unused parameters.
     while (true)
     {
-        if (connected)
-        {
-            // rover_gps->Update();
-            chThdSleepMilliseconds(timing::ESTIMATION_TASK_MS);
-        }
+        state_machine->ControlUpdate();
+        chThdSleepMilliseconds(timing::CONTROL_TASK_MS);
     }
 }
 
-static THD_WORKING_AREA(SlowThread, 200);
+static THD_WORKING_AREA(SLOW_THREAD, 1024);
 
 static THD_FUNCTION(Thread2, arg)
 {
     (void)arg;  // avoid warning on unused parameters.
     while (true)
     {
-        if (connected)
-        {
-            rover_compass->Update();
-            // TODO: figure out motor update frequency
-            left_motor->Update();
-            right_motor->Update();
-            drop_servo->Update();
-            chThdSleepMilliseconds(timing::SLOW_TASK_MS);
-        }
+        state_machine->SlowUpdate();
+        // TODO: figure out motor update frequency
+
+        chThdSleepMilliseconds(timing::SLOW_TASK_MS);
+    }
+}
+
+static THD_WORKING_AREA(STATE_THREAD, 1024);
+
+static THD_FUNCTION(Thread3, arg)
+{
+    (void)arg;  // avoid warning on unused parameters.
+    while (true)
+    {
+        state_machine->StateMachineUpdate();
+        chThdSleepMilliseconds(timing::STATE_MACHINE_TASK_MS);
     }
 }
 
 void chSetup()
 {
-    chThdCreateStatic(GPSThread, sizeof(GPSThread), HIGHPRIO, Thread0, NULL);
-    chThdCreateStatic(EstimationThread, sizeof(EstimationThread), LOWPRIO, Thread1, NULL);
-    chThdCreateStatic(SlowThread, sizeof(SlowThread), NORMALPRIO, Thread2, NULL);
+    chThdCreateStatic(FAST_THREAD, sizeof(FAST_THREAD), HIGHPRIO, Thread0, NULL);
+    chThdCreateStatic(SLOW_THREAD, sizeof(SLOW_THREAD), NORMALPRIO, Thread2, NULL);
+    chThdCreateStatic(CONTROL_THREAD, sizeof(CONTROL_THREAD), LOWPRIO, Thread1, NULL);
+    chThdCreateStatic(STATE_THREAD, sizeof(STATE_THREAD), LOWPRIO, Thread3, NULL);
 }
 
 void setup()
 {
     Serial.begin(115200);
 
-    rover_compass = new compass::BNO055Compass("bno055");
-    rover_gps     = new gps::AdafruitUltimateGPS("gps");
-    ppm_rc        = new rc::PPMReceiver("ppm rc receiver");
-
-    rover_controller = new controller::RoverController();
-    left_motor       = new motor::DCMotor("left_motor", motor::MotorMapping::LEFT_MOTOR);
-    right_motor = new motor::DCMotor("right_motor", motor::MotorMapping::RIGHT_MOTOR);
-    drop_servo  = new servo::Servo("servo");
-
-    Serial.println("=============== AUVSI Rover ======================");
-
-    rover_compass->Attach();
-    // rover_gps->Attach();
-    ppm_rc->Attach();
-    left_motor->Attach();
-    right_motor->Attach();
-    drop_servo->Attach();
-
-
-    connected = true;
-    // calibration procedure
-
-    // rover_compass->Calibrate();
-    // rover_gps->Calibrate();
-
-
-    pinMode(LED_BUILTIN, OUTPUT);
+    state_machine = new controller::StateMachine();
 
     chBegin(chSetup);
 
@@ -123,78 +81,10 @@ void setup()
     }
 }
 
-
-uint32_t gpsTimer = millis();
+uint32_t count = 0;
 
 void loop()
 {
-    chThdSleepMilliseconds(250);
-    if (connected)
-    {
-        switch (ppm_rc->ReadRCSwitchMode())
-        {
-            case rc::RCSwitchMode::MANUAL:
-            {
-                auto rc_result = controller::RoverController::RCController(
-                    ppm_rc->ReadThrottle(), ppm_rc->ReadYaw());
-                auto motor_result = controller::RoverController::MotorController(
-                    rc_result.first, rc_result.second);
-                left_motor->ChangeInput(motor_result.first);
-                right_motor->ChangeInput(motor_result.second);
-
-                break;
-            }
-            case rc::RCSwitchMode::AUTO:
-            {
-                if (!rover_controller->GetLandingStatus())
-                {
-                    double accelx, accely, accelz;
-                    std::tie(accelx, accely, accelz) = rover_compass->GetAccelVector();
-                    rover_controller->LandingDetectionUpdate(accelx, accely, accelz);
-                    break;
-                }
-                else
-                {
-                    if (!rover_gps->WaitForGPSConnection())
-                    {
-                        rover_controller->CreateWaypoint(
-                            rover_gps->GetCurrentGPSCoordinate());
-                    }
-                    if (!rover_controller->FinalArrived())
-                    {
-                        // TODO: make the rover focus on going straight from waypoint to
-                        // waypoint, instead depend on GPS corrdiante.
-                        // update the current controller
-                        auto current_coordinate = rover_gps->GetCurrentGPSCoordinate();
-                        auto target_coordinate =
-                            rover_controller->UpdateWaypoint(current_coordinate);
-                        auto auto_result = controller::RoverController::AutoController(
-                            current_coordinate, target_coordinate);
-                        auto motor_result = controller::RoverController::MotorController(
-                            auto_result.first, auto_result.second);
-                        left_motor->ChangeInput(motor_result.first);
-                        right_motor->ChangeInput(motor_result.second);
-                        break;
-                    }
-                    // if arrived, default to TERMINATE mode.
-                }
-            }
-
-            case rc::RCSwitchMode::TERMINATE:
-            {
-                // LPM, disable everything.
-            }
-            default:
-                break;
-        }
-
-        rover_gps->Read();
-
-        if (millis() - gpsTimer > 1000)
-        {
-            gpsTimer = millis();
-
-            rover_gps->Update();
-        }
-    }
+    state_machine->Debug();
+    chThdSleepMilliseconds(500);
 }

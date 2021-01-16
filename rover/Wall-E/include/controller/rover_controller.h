@@ -1,10 +1,18 @@
-#pragma once
-#include <Adafruit_BNO055.h>
-#include <constants.h>
-#include <sensor/gps_coordinate.h>
+/**
+ * @file rover_controller.h
+ * @author your name (you@domain.com)
+ * @brief Controller for the Rover, include rover's control mapping, estimation and
+ * localization
+ * @version 0.1
+ * @date 2021-01-12
+ *
+ * @copyright Copyright (c) 2021
+ *
+ */
 
-#include <deque>
-#include <queue>
+#include <constants.h>
+#include <utility/imumaths.h>
+
 #include <tuple>
 
 namespace controller
@@ -12,39 +20,58 @@ namespace controller
     class RoverController
     {
        private:
-        bool final_arrived;
-        bool waypoints_created;
-        bool landed;
-        imu::Vector<3> average;
-        std::deque<bool> landing_status_state;
+        /* our state model(IMU's state model)
+             +----------+
+             |         *| RST   PITCH  ROLL  HEADING
+         ADR |*        *| SCL
+         INT |*        *| SDA     ^            /->
+         PS1 |*        *| GND     |            |
+         PS0 |*        *| 3VO     Y    X(Z)-->    \-Z(X)
+             |         *| VIN
+             +----------+
+        */
+        imu::Vector<2> position;
+        imu::Vector<2> velocity;
+        imu::Vector<2> acceleration;
+        imu::Vector<2> w_theta_dot;  // [left wheel velocity, right wheel velocity]
 
-        sensor::gps::GPSCoordinate FINAL_WAYPOINT = sensor::gps::GPSCoordinate(
-            estimation::DEFAULT_FINAL_LATITUDE, estimation::DEFAULT_FINAL_LONGITUDE);
+        imu::Vector<3> q_dot;  //[x, y, theta], the state model of Rover
+        int dt;                // (ms)
+        double last_error;
+        double error_sum;
 
-        std::queue<sensor::gps::GPSCoordinate> intermediate_waypoints;
+        double KP;
+        double KI;
+        double KD;
 
-        double distance_threshold;
+        /**
+         * @brief Correct the error angle. Since heading is between 0-360, there are some
+         * edge cases where the angle roll over 360
+         *
+         * @param current_heading raw heading from sensor
+         * @param turn_angle desired/input heading
+         * @return double corrected error heading
+         */
+        double PIDErrorCorrection(double current_heading, double turn_angle);
 
-        bool WithinLimit(double src, double val, double limit) const;
 
        public:
-        RoverController();
+        imu::Vector<3> q;  //[x, y, theta], the state model of Rover
+        RoverController(int dt);
 
-        bool FinalArrived() const;
-        void CreateWaypoint(std::pair<double, double> src);
-        std::pair<double, double> UpdateWaypoint(std::pair<double, double> src);
-
+        /**
+         * @brief Update the Rover state model q
+         */
+        void RoverControllerUpdate(imu::Vector<3> linear_accel,
+                                   imu::Vector<3> orientation, imu::Vector<3> euler);
         /**
          * @brief Processes the passed speed and angle and returns the values passed to
          * the dc motors
-         * @param throttle 0 <= x <= 100
-         * @param turn_angle angle to turn (-180 <= x <= 180)
-         *                   Right: 0 < x <= 180
-         *                   Left: -180 <= x < 0
+         * @param input data pair of throttle value and turn angle (-180 to 180) degree
          * @returns a pair of values passed to the dc motors that will achieve the effect
          * described by the passed arguments
          */
-        static std::pair<double, double> MotorController(int throttle, int turn_angle);
+        static std::pair<double, double> MotorController(std::pair<double, double> input);
 
         /**
          * @brief Manual mode: Converts the RC stick values to corresponding throttle and
@@ -57,46 +84,18 @@ namespace controller
         static std::pair<double, double> RCController(int throttle_value, int yaw_value);
 
         /**
-         * @brief Auto mode: Determines the necessary speed and turn angle given a current
-         * and target location
-         * @param src latitude and longitude of the current location
-         * @param dest latitude and longitude of the target location
-         * @returns a pair of values representing the necessary speed and turn angle
-         */
-        static std::pair<double, double> AutoController(std::pair<double, double> src,
-                                                        std::pair<double, double> dest);
-
-        /**
-         * @brief Landing detection algorithm. Takes input from
-         *
-         * @todo complete function signature.
-         *
-         */
-        void LandingDetectionUpdate(double accelx, double accely, double accelz);
-
-        bool GetLandingStatus() const;
-
-        /**
          * Calculates the necessary turn angle / heading difference between the target
          * heading and current heading
          * @param src  the current gps coordinate
          * @param dest the target gps coordinate
-         * @returns the angle
+         * @param heading the current heading (0-360) degree
+         * @returns data pair of throttle value and turn angle (-180 to 180) degree
          */
-        static double HeadingController(std::pair<double, double> src,
-                                        std::pair<double, double> dest);
+        std::pair<double, double> HeadingPIDController(std::pair<double, double> src,
+                                                       std::pair<double, double> dest,
+                                                       double current_heading);
 
-        /**
-         * Determines if the rover is close enough to the target location
-         * @param src the current rover coordinate
-         * @param dest the target rover coordinate
-         * @param distance_threshold the maximum allowable distance to be considered close
-         * enough
-         * @returns true if the distance between the coordinates is less than the
-         * distance_threshold
-         */
-        static bool ReachedWaypoint(std::pair<double, double> src,
-                                    std::pair<double, double> dest,
-                                    double distance_threshold);
+
+        void Debug();
     };
 }  // namespace controller

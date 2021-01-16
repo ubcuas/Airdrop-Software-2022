@@ -4,19 +4,20 @@
 #include <pin_assignment.h>
 #include <sensor/adafruit_ultimate_gps.h>
 #include <sensor/gps_coordinate.h>
+
+// #ifndef ARDUINO
+//         SoftwareSerial RoverSerial(pin::GPS_TX_PIN, pin::GPS_RX_PIN);  // arduino
+// #else
+#define RoverSerial                                                                      \
+    Serial1  // teensy
+             // #endif
 namespace sensor
 {
     namespace gps
     {
-#ifndef ARDUINO
-        SoftwareSerial mySerial(pin::GPS_TX_PIN, pin::GPS_RX_PIN);  // arduino
-#else
-#define mySerial Serial1  // teensy
-#endif
-
         bool AdafruitUltimateGPS::CheckConnection()
         {
-            return GPS->fix;
+            return GPS.fix;
         }
 
         bool AdafruitUltimateGPS::Calibrate()
@@ -28,25 +29,25 @@ namespace sensor
 
         void AdafruitUltimateGPS::Debug()
         {
-            Serial.println("GPS ====================");
-            Serial.print("Latitude: ");
-            Serial.println(current_location->GetLatitude(), 6);
-            Serial.print("Longitude: ");
-            Serial.println(current_location->GetLongitude(), 6);
+            Serial.printf("[GPS]\n====================\n");
+            Serial.printf("Latitude: %f\n", current_location->GetLatitude());
+            Serial.printf("Longitude: %f\n", current_location->GetLongitude());
             Serial.println("================");
         }
 
         void AdafruitUltimateGPS::Attach()
         {
-            GPS = new Adafruit_GPS(&mySerial);
+            GPS = Adafruit_GPS(&RoverSerial);
 
             current_location = new GPSCoordinate(estimation::DEFAULT_GPS_LATITUDE,
                                                  estimation::DEFAULT_GPS_LONGITUDE);
-            GPS->begin(115200);
-            GPS->sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
-            GPS->sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
-            GPS->sendCommand(PGCMD_ANTENNA);
-            mySerial.println(PMTK_Q_RELEASE);
+            last_location    = new GPSCoordinate(estimation::DEFAULT_GPS_LATITUDE,
+                                              estimation::DEFAULT_GPS_LONGITUDE);
+            GPS.begin(9600);
+            GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
+            GPS.sendCommand(PMTK_SET_NMEA_UPDATE_10HZ);
+            GPS.sendCommand(PGCMD_ANTENNA);
+            RoverSerial.println(PMTK_Q_RELEASE);
         }
 
         void AdafruitUltimateGPS::Update()
@@ -54,25 +55,25 @@ namespace sensor
             last_location->SetLatitude(current_location->GetLatitude());
             last_location->SetLongitude(current_location->GetLongitude());
 
-            current_location->SetLatitude(GPS->latitudeDegrees);
-            current_location->SetLongitude(GPS->longitudeDegrees);
+            current_location->SetLatitude(GPS.latitude);
+            current_location->SetLongitude(GPS.longitude);
         }
 
         void AdafruitUltimateGPS::Read()
         {
-            char c = GPS->read();
+            char c = GPS.read();
 
             (void)c;
             // if you want to debug, this is a good time to do it!
+
             // if (c)
-            //     Serial.write(c);
+            //     Serial.print(c);
 
-            if (GPS->newNMEAreceived())
+            if (GPS.newNMEAreceived())
             {
-                Serial.println(GPS->lastNMEA());  // this also sets the
+                // Serial.println(GPS.lastNMEA());  // this also sets the
                 // newNMEAreceived() flag to false
-
-                if (!GPS->parse(GPS->lastNMEA()))
+                if (!GPS.parse(GPS.lastNMEA()))
                     return;
             }
         }

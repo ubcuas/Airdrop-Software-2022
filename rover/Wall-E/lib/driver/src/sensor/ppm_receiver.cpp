@@ -16,7 +16,7 @@ namespace sensor
 
         bool PPMReceiver::CheckConnection()
         {
-            return true;
+            return false;
         }
 
         void PPMReceiver::Update()

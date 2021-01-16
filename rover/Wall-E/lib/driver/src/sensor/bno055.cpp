@@ -19,6 +19,7 @@ namespace sensor
 
         void BNO055Compass::Attach()
         {
+            // Use Wire1 for BN055 since Wire1 doesn't work for BMP280
             bno055 = Adafruit_BNO055(55, 0x28);
             if (!bno055.begin())
             {
@@ -44,24 +45,28 @@ namespace sensor
         bool BNO055Compass::Calibrate()
         {
             uint8_t system, gyro, accel, mg = 0;
-            bno055.getCalibration(&system, &gyro, &accel, &mg);
+            bno055.getCalibration(&system, &gyro, &accel, &compass_calibration);
 
-            Serial.print(this->sensor_name);
-            Serial.println(" Calibrate");
-            if ((system == 0) || (gyro == 0) || (accel == 0) || (mg == 0))
+            if ((system == 0) || (gyro == 0) || (accel == 0) || (compass_calibration == 0))
             {
                 return false;
             }
-
             return true;
         }
 
         void BNO055Compass::Debug()
         {
-            Serial.println("Compass =================");
-            Serial.print(this->sensor_name);
-            Serial.println(" Debug");
+            Serial.printf("[Compass] \n=================\n");
+            Serial.printf("calibrate: %d\n", compass_calibration);
             Serial.printf("Current heading: %f\n", current_heading);
+            imu::Vector<3> data = bno055.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
+            Serial.printf("linear accel: x: %f, y: %f, z: %f\n", data[0], data[1],
+                          data[2]);
+            data = bno055.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
+            Serial.printf("orientation: x: %f, y: %f, z: %f\n", data[0], data[1],
+                          data[2]);
+            data = bno055.getVector(Adafruit_BNO055::VECTOR_EULER);
+            Serial.printf("euler: x: %f, y: %f, z: %f\n", data[0], data[1], data[2]);
             Serial.println("=================");
         }
 
@@ -70,13 +75,20 @@ namespace sensor
             return current_heading;
         }
 
-        std::tuple<double, double, double> BNO055Compass::GetAccelVector()
+        imu::Vector<3> BNO055Compass::GetAccelVector()
         {
-            imu::Vector<3> accel = bno055.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
-
-            return std::make_tuple(accel[0], accel[1], accel[2]);
+            return bno055.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
         }
 
+        imu::Vector<3> BNO055Compass::GetOrientationAccelVector()
+        {
+            return bno055.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
+        }
+
+        imu::Vector<3> BNO055Compass::GetEulerVector()
+        {
+            return bno055.getVector(Adafruit_BNO055::VECTOR_EULER);
+        }
 
     }  // namespace compass
 

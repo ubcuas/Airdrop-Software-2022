@@ -1,4 +1,7 @@
 
+# Library Dependency
+---
+
 This directory is intended for project specific (private) libraries.
 PlatformIO will compile them to static libraries and link into executable file.
 
@@ -17,9 +20,10 @@ For example, see a structure of the following two libraries `Foo` and `Bar`:
 |  |     |- Bar.h
 |  |  |- library.json (optional, custom build options, etc) https://docs.platformio.org/page/librarymanager/config.html
 |  |
-|  |--Foo
-|  |  |- Foo.c
-|  |  |- Foo.h
+|  |--driver
+|  |  |--sensor
+|  |     |- Foo.c
+|  |     |- Foo.h
 |  |
 |  |- README --> THIS FILE
 |
@@ -29,7 +33,7 @@ For example, see a structure of the following two libraries `Foo` and `Bar`:
 
 and a contents of `src/main.c`:
 ```
-#include <Foo.h>
+#include <sensor/Foo.h>
 #include <Bar.h>
 
 int main (void)
