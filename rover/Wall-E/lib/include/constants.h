@@ -1,5 +1,6 @@
 #pragma once
 #include <Arduino.h>
+#include <sensor/gps_coordinate.h>
 
 namespace config
 {
@@ -76,3 +77,20 @@ namespace config
     const static int SCREEN_HEIGHT = 32;
     const static int OLED_RESET    = 4;
 }  // namespace config
+
+namespace boundary
+{
+    const static float p1_lat = 38.14636;
+    const static float p1_lon = -76.42617;
+    const static float p2_lat = 38.14617;
+    const static float p2_lon = -76.42667;
+    const static float p3_lat = 38.14542;
+    const static float p3_lon = -76.42661;
+    const static float p4_lat = 38.14558;
+    const static float p4_lon = -76.42608;
+    
+    const static sensor::gps::GPSCoordinate p1(p1_lat, p1_lon);
+    const static sensor::gps::GPSCoordinate p2(p2_lat, p2_lon);
+    const static sensor::gps::GPSCoordinate p3(p3_lat, p3_lon);
+    const static sensor::gps::GPSCoordinate p4(p4_lat, p4_lon);
+}

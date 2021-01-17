@@ -166,6 +166,11 @@ namespace controller
             }
             case AutoState::DRIVE:
             {
+                if (Boundary::IsWithinBoundary(rover_gps->GetCurrentGPSCoordinate()))
+                {
+                    current_state = AutoState::TERMINATED;
+                    break;
+                }
                 if (rover_gps->CheckConnection())
                 {
                     // GPS enabled
@@ -203,6 +208,10 @@ namespace controller
             case AutoState::ARRIVED:
             {
                 // TODO: display something?
+            }
+            case AutoState::TERMINATED:
+            {
+                // Go to LPM
             }
             default:
                 break;

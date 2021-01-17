@@ -22,20 +22,22 @@
 #include "controller/landing_controller.h"
 #include "controller/planning.h"
 #include "controller/rover_controller.h"
+#include "controller/boundary_check.h"
 
 #define STATE_MACHINE_DEBUG true
 namespace controller
 {
     // This is a very ugly and lame way to map Enum to string. However, the alternative
     // are unnecessarily complicated
-    const String auto_state_name[5] = {"IDLE", "DROP", "LAND", "DRIVE", "ARRIVED"};
+    const String auto_state_name[6] = {"IDLE", "DROP", "LAND", "DRIVE", "ARRIVED", "TERMINATED"};
     enum AutoState
     {
         IDLE,
         DROP,
         LAND,
         DRIVE,
-        ARRIVED
+        ARRIVED,
+        TERMINATED
     };
     class StateMachine
     {
