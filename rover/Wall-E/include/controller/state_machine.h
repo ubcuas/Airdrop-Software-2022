@@ -55,7 +55,10 @@ namespace controller
         controller::Planning* planning;
         AutoState current_state;
         std::pair<double, double> motor_result;
+
+
         std::pair<double, double> current_coordinate;
+        std::pair<double, double> last_coordinate;
         std::pair<double, double> target_coordinate;
 
         /**

@@ -1,5 +1,6 @@
 #include "controller/rover_controller.h"
 
+#include <TinyGPS++.h>
 #include <constants.h>
 #include <math.h>
 #include <pin_assignment.h>
@@ -65,21 +66,21 @@ namespace controller
     }
     std::pair<double, double> RoverController::HeadingPIDController(
         std::pair<double, double> src, std::pair<double, double> dest,
-        double current_heading)
+        double current_heading, double current_dist)
     {
         // TODO: check the distance to determine the throttle
-        double throttle   = 50;
+        double throttle = 65;
+        if (current_dist < 5)
+        {
+            throttle = 45;
+        }
+
         double turn_angle = sensor::gps::GPSCoordinate::CourseTo(src.first, src.second,
                                                                  dest.first, dest.second);
-
-        // NOTE: testing only
-        turn_angle = 0;
-
         // if 359 - 0, it's actually -1 but it will be 359 instead
         // angle alignment
-        double aligned_heading =
-            (current_heading > 180) ? (current_heading - 180) : (current_heading + 180);
-        double error = PIDErrorCorrection(aligned_heading, turn_angle);
+
+        double error = PIDErrorCorrection(current_heading, turn_angle);
         error_sum += error;
         error_sum = constrain(error_sum, estimation::I_MIN, estimation::I_MAX);
 

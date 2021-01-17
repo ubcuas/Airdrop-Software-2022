@@ -24,23 +24,26 @@ namespace sensor
             float GetLongitude() const;
             void SetLatitude(float lat);
             void SetLongitude(float longi);
-            float GetDistance(GPSCoordinate dest);
-            float GetHeading(GPSCoordinate dest);
+
             static float GetDistanceBetween(GPSCoordinate src, GPSCoordinate dest);
             static float GetHeadingBetween(GPSCoordinate src, GPSCoordinate dest);
-            static float DistanceBetween(float lat1, float long1, float lat2, float long2);
+            static float DistanceBetween(float lat1, float long1, float lat2,
+                                         float long2);
             static float CourseTo(float lat1, float long1, float lat2, float long2);
 
             /**
              * @brief Get the Intermediate Point object
              *  http://www.movable-type.co.uk/scripts/latlong.html
-             * @param src 
-             * @param dest 
-             * @param distance 
-             * @return float 
+             * @param src
+             * @param dest
+             * @param distance
+             * @return float
              */
-            static std::pair<float, float> GetIntermediatePoint(GPSCoordinate src, GPSCoordinate dest, float distance);
+            static std::pair<float, float> GetIntermediatePoint(GPSCoordinate src,
+                                                                GPSCoordinate dest,
+                                                                float distance);
             std::pair<float, float> ConvertToPair() const;
+            static GPSCoordinate CovertFromPair(std::pair<double, double> src);
         };
     }  // namespace gps
 

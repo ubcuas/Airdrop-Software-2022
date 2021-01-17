@@ -6,15 +6,17 @@ namespace display
 {
     struct oled_dict
     {
-        float altitude  = 0;
-        float latitude  = 0;
-        float longitude = 0;
-        float heading   = 0;
-        float x         = 0;
-        float y         = 0;
-        float x_dot     = 0;
-        float y_dot     = 0;
-        String state    = "";
+        float altitude        = 0;
+        float latitude        = 0;
+        float longitude       = 0;
+        float compass_heading = 0;
+        uint8_t calibration   = 0;
+        float distance        = 0;
+        float target_heading  = 0;
+        bool gps_fix          = 0;
+        float x_dot           = 0;
+        float y_dot           = 0;
+        String state          = "";
     };
     class OLED
     {

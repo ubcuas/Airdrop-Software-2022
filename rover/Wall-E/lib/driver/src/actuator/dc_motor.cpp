@@ -69,6 +69,7 @@ namespace actuator
 
         void DCMotor::StopMotor()
         {
+            current_velocity = 0;
             digitalWrite(this->dir_a_pin, LOW);
             digitalWrite(this->dir_b_pin, LOW);
         }

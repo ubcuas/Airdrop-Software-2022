@@ -93,7 +93,8 @@ namespace controller
          */
         std::pair<double, double> HeadingPIDController(std::pair<double, double> src,
                                                        std::pair<double, double> dest,
-                                                       double current_heading);
+                                                       double current_heading,
+                                                       double current_dist);
 
 
         void Debug();

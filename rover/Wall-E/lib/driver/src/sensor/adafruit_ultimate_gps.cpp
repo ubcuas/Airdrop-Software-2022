@@ -55,8 +55,26 @@ namespace sensor
             last_location->SetLatitude(current_location->GetLatitude());
             last_location->SetLongitude(current_location->GetLongitude());
 
-            current_location->SetLatitude(GPS.latitude);
-            current_location->SetLongitude(GPS.longitude);
+            float lat_sign, lon_sign;
+            if (GPS.lat == 'N')
+            {
+                lat_sign = 1.0;
+            }
+            else
+            {
+                lat_sign = -1.0;
+            }
+            if (GPS.lon == 'W')
+            {
+                lon_sign = 1.0;
+            }
+            else
+            {
+                lon_sign = -1.0;
+            }
+
+            current_location->SetLatitude(lat_sign * GPS.latitudeDegrees);
+            current_location->SetLongitude(lon_sign * GPS.longitudeDegrees);
         }
 
         void AdafruitUltimateGPS::Read()
@@ -65,9 +83,11 @@ namespace sensor
 
             (void)c;
             // if you want to debug, this is a good time to do it!
-
-            // if (c)
-            //     Serial.print(c);
+            if (config::GPS_SERIAL_DEBUG)
+            {
+                if (c)
+                    Serial.print(c);
+            }
 
             if (GPS.newNMEAreceived())
             {

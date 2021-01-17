@@ -37,6 +37,7 @@ namespace controller
          */
         std::pair<double, double> UpdateWaypoint(std::pair<double, double> src);
 
+        std::pair<double, double> GetNextWayPoint();
         /**
          * Determines if the rover is close enough to the target location
          * @param src the current rover coordinate
@@ -49,5 +50,6 @@ namespace controller
         static bool ReachedWaypoint(std::pair<double, double> src,
                                     std::pair<double, double> dest,
                                     double distance_threshold);
+
     };
 }  // namespace controller

@@ -37,9 +37,27 @@ namespace sensor
             gyr = bno055.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
             mag = bno055.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
 
+            uint8_t system, gyro, accel = 0;
+            bno055.getCalibration(&system, &gyro, &accel, &compass_calibration);
+
             imu::Vector<3> euler = bno055.getVector(Adafruit_BNO055::VECTOR_EULER);
 
             current_heading = euler.x();
+
+            if ((current_heading - magic::COMPASS_OFFSET) < 0)
+            {
+                current_heading = current_heading - magic::COMPASS_OFFSET + 360;
+            }
+            else if ((current_heading + magic::COMPASS_OFFSET) > 360)
+            {
+                current_heading = current_heading + magic::COMPASS_OFFSET - 360;
+            }
+            else
+            {
+                current_heading -= magic::COMPASS_OFFSET;
+            }
+            current_heading = (current_heading > 180) ? (current_heading - 180)
+                                                      : (current_heading + 180);
         }
 
         bool BNO055Compass::Calibrate()
@@ -47,7 +65,8 @@ namespace sensor
             uint8_t system, gyro, accel, mg = 0;
             bno055.getCalibration(&system, &gyro, &accel, &compass_calibration);
 
-            if ((system == 0) || (gyro == 0) || (accel == 0) || (compass_calibration == 0))
+            if ((system == 0) || (gyro == 0) || (accel == 0) ||
+                (compass_calibration == 0))
             {
                 return false;
             }
