@@ -29,7 +29,7 @@ namespace sensor
 
         void AdafruitUltimateGPS::Debug()
         {
-            Serial.printf("[GPS]\n====================\n");
+            Serial.printf("[GPS]\n====================\nsat: %d\n", GPS.satellites);
             Serial.printf("Latitude: %f\n", current_location->GetLatitude());
             Serial.printf("Longitude: %f\n", current_location->GetLongitude());
             Serial.println("================");

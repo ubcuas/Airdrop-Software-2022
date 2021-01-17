@@ -69,16 +69,14 @@ namespace controller
         double current_heading, double current_dist)
     {
         // TODO: check the distance to determine the throttle
-        double throttle = 65;
-        if (current_dist < 5)
+        double throttle = estimation::FAST_SPEED;
+        if (current_dist < estimation::FINAL_SLOW_DOWN_THRESH)
         {
-            throttle = 45;
+            throttle = estimation::SLOW_SPEED;
         }
 
         double turn_angle = sensor::gps::GPSCoordinate::CourseTo(src.first, src.second,
                                                                  dest.first, dest.second);
-        // if 359 - 0, it's actually -1 but it will be 359 instead
-        // angle alignment
 
         double error = PIDErrorCorrection(current_heading, turn_angle);
         error_sum += error;

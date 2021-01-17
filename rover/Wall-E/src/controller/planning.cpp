@@ -52,7 +52,7 @@ namespace controller
             {
                 // the waypoint map is empty, thus we have arrived at the final waypoint.
                 final_arrived = true;
-                return std::make_pair(0, 0);
+                return std::make_pair(estimation::DEFAULT_FINAL_LATITUDE, estimation::DEFAULT_FINAL_LONGITUDE);
             }
             else
             {

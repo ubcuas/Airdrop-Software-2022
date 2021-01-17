@@ -13,7 +13,7 @@ namespace timing
     const static int SLOW_TASK_MS          = 33;
     const static int GPS_IDLE_MS           = 1000;
     const static int GPS_TRACKING_MS       = 1;
-    const static int STATE_MACHINE_TASK_MS = 600;
+    const static int STATE_MACHINE_TASK_MS = 750;
 }  // namespace timing
 
 namespace estimation
@@ -22,16 +22,20 @@ namespace estimation
     const static double DEFAULT_GPS_LONGITUDE = -122.792589;
 
     // The goal GPS coordinate
-    const static double DEFAULT_FINAL_LATITUDE  = 49.284492;
-    const static double DEFAULT_FINAL_LONGITUDE = -122.791767;
+    const static double DEFAULT_FINAL_LATITUDE  = 49.2843990;
+    const static double DEFAULT_FINAL_LONGITUDE = -122.7921191;
 
     // The default drop location
     const static double DEFAULT_DROP_LATITUDE  = 49.284286;
     const static double DEFAULT_DROP_LONGITUDE = -122.791641;
 
-    const static double INTERMEDIATE_WAYPOINT_THRESHOLD = 5;  // m
-    const static double FINAL_WAYPOINT_THRESHOLD        = 1;  // m
+    const static double INTERMEDIATE_WAYPOINT_THRESHOLD = 5;    // m
+    const static double FINAL_SLOW_DOWN_THRESH          = 3;    // m
+    const static double FINAL_WAYPOINT_THRESHOLD        = 0.7;  // m
     const static int WAYPOINT_NUMBER                    = 1;
+
+    const static int FAST_SPEED = 70;
+    const static int SLOW_SPEED = 45;
 
     // TODO: auto tune
     // This PID is for throttle = 50
@@ -59,7 +63,7 @@ namespace estimation
 
 namespace magic
 {
-    const static double COMPASS_OFFSET     = -15;  // degree,
+    const static double COMPASS_OFFSET     = 15;  // degree,
     const static unsigned int HIGH_READING = 1000;
     const static unsigned int LOW_READING  = 0;
     const static int AUTO_MODE             = 1000;
