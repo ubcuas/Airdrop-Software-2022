@@ -1,4 +1,12 @@
-#pragma once
+/**
+ * @file bmp280.h
+ * @brief
+ * @version 1.0
+ * @date 2021-01-17
+ *
+ * @copyright Copyright (c) 2021
+ *
+ */
 
 #include <Adafruit_BMP280.h>
 #include <Adafruit_Sensor.h>

@@ -1,3 +1,12 @@
+/**
+ * @file actuator.h
+ * @brief
+ * @version 1.0
+ * @date 2021-01-17
+ *
+ * @copyright Copyright (c) 2021
+ *
+ */
 #pragma once
 
 #include <Arduino.h>
@@ -5,10 +14,9 @@
 namespace actuator
 {
     /**
-     * @brief Interface for actuator drivers.
+     * @brief Interface for actuator drivers. Follow Rules of Five.
      *
      */
-
     class Actuator
     {
        private:

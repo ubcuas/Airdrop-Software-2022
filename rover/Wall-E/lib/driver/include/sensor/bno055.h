@@ -2,7 +2,7 @@
  * @file bno055.h
  * @author your name (you@domain.com)
  * @brief
- * @version 0.1
+ * @version 1.0
  * @date 2021-01-11
  *  Board layout:
          +----------+

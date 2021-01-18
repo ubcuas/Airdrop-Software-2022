@@ -7,27 +7,27 @@ namespace controller
     StateMachine::StateMachine()
     {
         // device initialization
-        rover_compass = new compass::BNO055Compass("bno055");
-        rover_gps     = new gps::AdafruitUltimateGPS("gps");
-        ppm_rc        = new rc::PPMReceiver("ppm rc receiver");
-        left_motor    = new motor::DCMotor("left_motor", motor::MotorMapping::LEFT_MOTOR);
-        right_motor = new motor::DCMotor("right_motor", motor::MotorMapping::RIGHT_MOTOR);
-        drop_servo  = new servo::Servo("servo");
-        rover_barometer =
-            new barometer::BMP280Barometer(barometer::LogicMode::I2C, "barometer");
-        rover_oled = new display::OLED();
+        rover_compass   = new compass::BNO055Compass("bno055");
+        rover_gps       = new gps::AdafruitUltimateGPS("gps");
+        ppm_rc          = new rc::PPMReceiver("ppm rc receiver");
+        left_motor      = new motor::DCMotor("left_motor", motor::MotorMapping::LEFT_MOTOR);
+        right_motor     = new motor::DCMotor("right_motor", motor::MotorMapping::RIGHT_MOTOR);
+        drop_servo      = new servo::Servo("servo");
+        rover_barometer = new barometer::BMP280Barometer(barometer::LogicMode::I2C, "barometer");
+        rover_oled      = new display::OLED();
 
         // controller initialization
         rover_controller   = new controller::RoverController(timing::SLOW_TASK_MS);
         landing_controller = new controller::LandingController();
         planning           = new controller::Planning();
 
-        current_coordinate = std::make_pair(estimation::DEFAULT_DROP_LATITUDE,
-                                            estimation::DEFAULT_DROP_LONGITUDE);
-        last_coordinate    = std::make_pair(estimation::DEFAULT_DROP_LATITUDE,
-                                         estimation::DEFAULT_DROP_LONGITUDE);
-        target_coordinate  = std::make_pair(estimation::DEFAULT_FINAL_LATITUDE,
-                                           estimation::DEFAULT_FINAL_LONGITUDE);
+        // GPS related variables
+        current_coordinate =
+            std::make_pair(estimation::DEFAULT_DROP_LATITUDE, estimation::DEFAULT_DROP_LONGITUDE);
+        last_coordinate =
+            std::make_pair(estimation::DEFAULT_DROP_LATITUDE, estimation::DEFAULT_DROP_LONGITUDE);
+        target_coordinate =
+            std::make_pair(estimation::DEFAULT_FINAL_LATITUDE, estimation::DEFAULT_FINAL_LONGITUDE);
 
         rover_compass->Attach();
         rover_gps->Attach();
@@ -38,7 +38,8 @@ namespace controller
         rover_barometer->Attach();
         current_state = AutoState::IDLE;
     }
-    void StateMachine::Calibration()
+    void StateMachine::Calibration() {}
+    void StateMachine::CheckConnection()
     {
         Serial.println("\nI2C Scanner");
 
@@ -82,7 +83,6 @@ namespace controller
         else
             Serial.println("done\n");
     }
-    void StateMachine::CheckConnection() {}
     void StateMachine::SlowUpdate()
     {
         rover_barometer->Update();
@@ -90,18 +90,16 @@ namespace controller
 
         landing_controller->LandingDetectionUpdate(rover_compass->GetAccelVector());
 
-        rover_controller->RoverControllerUpdate(
-            rover_compass->GetAccelVector(), rover_compass->GetOrientationAccelVector(),
-            rover_compass->GetEulerVector());
+        rover_controller->RoverControllerUpdate(rover_compass->GetAccelVector(),
+                                                rover_compass->GetOrientationAccelVector(),
+                                                rover_compass->GetEulerVector());
         if (current_state == AutoState::DRIVE)
         {
             auto auto_result = rover_controller->HeadingPIDController(
                 current_coordinate, target_coordinate, rover_compass->GetHeading(),
                 sensor::gps::GPSCoordinate::GetDistanceBetween(
-                    sensor::gps::GPSCoordinate(current_coordinate.first,
-                                               current_coordinate.second),
-                    sensor::gps::GPSCoordinate(target_coordinate.first,
-                                               target_coordinate.second)));
+                    sensor::gps::GPSCoordinate(current_coordinate.first, current_coordinate.second),
+                    sensor::gps::GPSCoordinate(target_coordinate.first, target_coordinate.second)));
             motor_result = controller::RoverController::MotorController(auto_result);
             left_motor->ChangeInput(motor_result.first);
             right_motor->ChangeInput(motor_result.second);
@@ -116,54 +114,59 @@ namespace controller
     {
         left_motor->Update();
         right_motor->Update();
+        // TODO: add servo back
         // drop_servo->Update();
     }
     void StateMachine::LEDUpdate() {}
     void StateMachine::Debug()
     {
-        // rover_barometer->Debug();
-        rover_compass->Debug();
-        rover_gps->Debug();
-        // landing_controller->Debug();
-        rover_controller->Debug();
-
         display::oled_dict data;
         data.calibration = rover_compass->compass_calibration;
         data.distance    = sensor::gps::GPSCoordinate::GetDistanceBetween(
-            sensor::gps::GPSCoordinate(current_coordinate.first,
-                                       current_coordinate.second),
-            sensor::gps::GPSCoordinate(target_coordinate.first,
-                                       target_coordinate.second));
+            sensor::gps::GPSCoordinate(current_coordinate.first, current_coordinate.second),
+            sensor::gps::GPSCoordinate(target_coordinate.first, target_coordinate.second));
         data.compass_heading = rover_compass->GetHeading();
         data.target_heading  = sensor::gps::GPSCoordinate::GetHeadingBetween(
-            sensor::gps::GPSCoordinate(current_coordinate.first,
-                                       current_coordinate.second),
-            sensor::gps::GPSCoordinate(target_coordinate.first,
-                                       target_coordinate.second));
+            sensor::gps::GPSCoordinate(current_coordinate.first, current_coordinate.second),
+            sensor::gps::GPSCoordinate(target_coordinate.first, target_coordinate.second));
         data.gps_fix   = rover_gps->CheckConnection();
         data.latitude  = current_coordinate.first;
         data.longitude = current_coordinate.second;
         data.altitude  = rover_barometer->GetAltitude();
         data.state     = auto_state_name[current_state];
 
-        rover_oled->displayDebugMessage(&data);
+        if (!config::NO_OLED_OUTPUT)
+        {
+            rover_oled->displayDebugMessage(&data);
+        }
 
-        Serial.printf("[State Machine]\n==========\n");
-        Serial.printf("GPS fix: %s\n", rover_gps->CheckConnection() ? "True" : "False");
-        Serial.printf("Target coordinate: %f, %f\n", target_coordinate.first,
-                      target_coordinate.second);
-        Serial.printf("Current coordinate: %f, %f\n", current_coordinate.first,
-                      current_coordinate.second);
-        Serial.printf("Next waypoint: %f, %f\n", planning->GetNextWayPoint().first,
-                      planning->GetNextWayPoint().second);
-        Serial.printf("distance: %f\n", data.distance);
-        Serial.printf("target_heading: %f\n", data.target_heading);
+        if (!config::NO_SERIAL_OUTPUT)
+        {
+            // rover_barometer->Debug();
+            rover_compass->Debug();
+            rover_gps->Debug();
+            // landing_controller->Debug();
+            rover_controller->Debug();
+
+            Serial.printf("[State Machine]\n==========\n");
+            Serial.printf("GPS fix: %s\n", rover_gps->CheckConnection() ? "True" : "False");
+            Serial.printf("Target coordinate: %f, %f\n", target_coordinate.first,
+                          target_coordinate.second);
+            Serial.printf("Current coordinate: %f, %f\n", current_coordinate.first,
+                          current_coordinate.second);
+            Serial.printf("Next waypoint: %f, %f\n", planning->GetNextWayPoint().first,
+                          planning->GetNextWayPoint().second);
+            Serial.printf("distance: %f\n", data.distance);
+            Serial.printf("target_heading: %f\n", data.target_heading);
+        }
     }
     void StateMachine::ManualStateMachine()
     {
-        auto rc_result = controller::RoverController::RCController(ppm_rc->ReadThrottle(),
-                                                                   ppm_rc->ReadYaw());
+        auto rc_result =
+            controller::RoverController::RCController(ppm_rc->ReadThrottle(), ppm_rc->ReadYaw());
         auto motor_result = controller::RoverController::MotorController(rc_result);
+        left_motor->ChangeInput(motor_result.first);
+        right_motor->ChangeInput(motor_result.second);
     }
 
     void StateMachine::AutoStateMachine()
@@ -184,26 +187,27 @@ namespace controller
             {
                 if (landing_controller->GetLandingStatus())
                 {
-                    if (rover_compass->compass_calibration == 3 &&
-                        rover_gps->CheckConnection())
-                    {
-                        current_state = AutoState::DRIVE;
-                    }
-
+                    // TODO: do more checks with barometer and GPS
+                    // drop_servo->ChangeInput();
+                    current_state = AutoState::CALIBRATE;
                     landing_controller->End();
                 }
                 break;
+            }
+            case AutoState::CALIBRATE:
+            {
+                if (rover_compass->compass_calibration == 3 && rover_gps->CheckConnection())
+                {
+                    current_state = AutoState::DRIVE;
+                }
             }
             case AutoState::DRIVE:
             {
                 if (rover_gps->CheckConnection())
                 {
-                    // GPS enabled
                     planning->CreateWaypoint(current_coordinate);
 
                     target_coordinate = planning->UpdateWaypoint(current_coordinate);
-
-                    // refresh gps denied tracking
                 }
                 else
                 {
@@ -212,17 +216,13 @@ namespace controller
                 }
                 if (planning->final_arrived)
                 {
-                    // TODO: make the rover focus on going straight from waypoint to
-                    // waypoint, instead depend on GPS corrdiante. update the current
-                    // controller
-
-                    // check if we have arrived or not, in GPS denied environment
                     current_state = AutoState::ARRIVED;
                 }
 
                 break;
             }
             case AutoState::ARRIVED:
+            case AutoState::TERMINATE:
             {
                 // TODO: display something?
                 left_motor->StopMotor();
@@ -240,7 +240,7 @@ namespace controller
 
         if (ppm_rc->CheckConnection())
         {
-            // TODO: the reset between states
+            // TODO: add reset between states
             switch (ppm_rc->ReadRCSwitchMode())
             {
                 case rc::RCSwitchMode::MANUAL:

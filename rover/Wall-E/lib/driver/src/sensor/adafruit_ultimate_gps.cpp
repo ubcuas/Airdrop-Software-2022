@@ -8,7 +8,7 @@
 // #ifndef ARDUINO
 //         SoftwareSerial RoverSerial(pin::GPS_TX_PIN, pin::GPS_RX_PIN);  // arduino
 // #else
-#define RoverSerial                                                                      \
+#define RoverSerial                                                                                                    \
     Serial1  // teensy
              // #endif
 namespace sensor
@@ -39,10 +39,8 @@ namespace sensor
         {
             GPS = Adafruit_GPS(&RoverSerial);
 
-            current_location = new GPSCoordinate(estimation::DEFAULT_GPS_LATITUDE,
-                                                 estimation::DEFAULT_GPS_LONGITUDE);
-            last_location    = new GPSCoordinate(estimation::DEFAULT_GPS_LATITUDE,
-                                              estimation::DEFAULT_GPS_LONGITUDE);
+            current_location = new GPSCoordinate(estimation::DEFAULT_DROP_LATITUDE, estimation::DEFAULT_DROP_LONGITUDE);
+            last_location    = new GPSCoordinate(estimation::DEFAULT_DROP_LATITUDE, estimation::DEFAULT_DROP_LONGITUDE);
             GPS.begin(9600);
             GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
             GPS.sendCommand(PMTK_SET_NMEA_UPDATE_10HZ);
@@ -100,8 +98,8 @@ namespace sensor
 
         bool AdafruitUltimateGPS::Stop()
         {
-            this->current_location->SetLatitude(estimation::DEFAULT_GPS_LATITUDE);
-            this->current_location->SetLongitude(estimation::DEFAULT_GPS_LONGITUDE);
+            this->current_location->SetLatitude(estimation::DEFAULT_DROP_LATITUDE);
+            this->current_location->SetLongitude(estimation::DEFAULT_DROP_LONGITUDE);
 
             return true;
         }
@@ -114,13 +112,11 @@ namespace sensor
 
         std::pair<double, double> AdafruitUltimateGPS::GetCurrentGPSCoordinate() const
         {
-            return std::make_pair(current_location->GetLatitude(),
-                                  current_location->GetLongitude());
+            return std::make_pair(current_location->GetLatitude(), current_location->GetLongitude());
         }
         std::pair<double, double> AdafruitUltimateGPS::GetLastGPSCoordinate() const
         {
-            return std::make_pair(current_location->GetLatitude(),
-                                  current_location->GetLongitude());
+            return std::make_pair(current_location->GetLatitude(), current_location->GetLongitude());
         }
 
     }  // namespace gps

@@ -1,13 +1,39 @@
+/**
+ * @file constants.h
+ * @brief All the constants in the code. Also include the Arduino header for convenience
+ * @version 1.0
+ * @date 2021-01-17
+ *
+ * @copyright Copyright (c) 2021
+ *
+ */
 #pragma once
-#include <Arduino.h>
 
+#include "Arduino.h"
 namespace config
 {
-    const static bool PERFORM_CALIBRATION = false;
-    const static bool GPS_SERIAL_DEBUG    = false;
+    /**
+     * @brief this is for system wise configuration. It will determine certain behaviors
+     * of the system to change. Check these before build, make sure that it's the correct
+     * config for the build.
+     *
+     */
+    const static bool PERFORM_CALIBRATION = false;  // Enable calibration
+    const static bool GPS_SERIAL_DEBUG =
+        false;  // Enable GPS raw serial reading echo. Check if GPS is ok
+    const static bool NO_SERIAL_OUTPUT = false;  // Disable Serial output
+
+    const static bool NO_OLED_OUTPUT = false;
+    const static int SCREEN_WIDTH    = 128;
+    const static int SCREEN_HEIGHT   = 32;
+    const static int OLED_RESET      = 4;
 }  // namespace config
 namespace timing
 {
+    /**
+     * @brief All Thread timing related constants. Unit is milliseconds
+     *
+     */
     const static int CONTROL_TASK_MS       = 100;
     const static int FAST_TASK_MS          = 1;
     const static int SLOW_TASK_MS          = 33;
@@ -18,9 +44,11 @@ namespace timing
 
 namespace estimation
 {
-    const static double DEFAULT_GPS_LATITUDE  = 49.283721;
-    const static double DEFAULT_GPS_LONGITUDE = -122.792589;
-
+    /**
+     * @brief all state, estimation, gps, motor, controller related constants.
+     *
+     * TODO: clean this up
+     */
     // The goal GPS coordinate
     const static double DEFAULT_FINAL_LATITUDE  = 49.2843990;
     const static double DEFAULT_FINAL_LONGITUDE = -122.7921191;
@@ -43,8 +71,8 @@ namespace estimation
     const static double DEFAULT_KI = 0;
     const static double DEFAULT_KD = 1;
 
-    const static double I_MAX = 90;
-    const static double I_MIN = -90;
+    const static double I_MAX = 90;   // "degrees"
+    const static double I_MIN = -90;  // "degrees"
 
     // landing controller
     // TODO: calibrate for these numbers
@@ -63,6 +91,10 @@ namespace estimation
 
 namespace magic
 {
+    /**
+     * @brief The magic numbers.
+     *
+     */
     const static double COMPASS_OFFSET     = 15;  // degree,
     const static unsigned int HIGH_READING = 1000;
     const static unsigned int LOW_READING  = 0;
@@ -75,10 +107,3 @@ namespace magic
     const static int MIN_MOTOR_INPUT       = 40;
     const static int PERCENTAGE            = 100;
 }  // namespace magic
-
-namespace config
-{
-    const static int SCREEN_WIDTH  = 128;
-    const static int SCREEN_HEIGHT = 32;
-    const static int OLED_RESET    = 4;
-}  // namespace config

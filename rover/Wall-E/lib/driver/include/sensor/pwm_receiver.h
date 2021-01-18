@@ -1,3 +1,12 @@
+/**
+ * @file pwm_receiver.h
+ * @brief
+ * @version 1.0
+ * @date 2021-01-17
+ *
+ * @copyright Copyright (c) 2021
+ *
+ */
 #pragma once
 #include <Arduino.h>
 #include <sensor/rc_receiver.h>

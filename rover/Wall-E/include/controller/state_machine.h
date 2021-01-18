@@ -1,7 +1,7 @@
 /**
  * @file state_machine.h
  * @brief
- * @version 0.1
+ * @version 1.0
  * @date 2021-01-12
  *
  * @copyright Copyright (c) 2021
@@ -28,18 +28,52 @@ namespace controller
 {
     // This is a very ugly and lame way to map Enum to string. However, the alternative
     // are unnecessarily complicated
-    const String auto_state_name[5] = {"IDLE", "DROP", "LAND", "DRIVE", "ARRIVED"};
+    const String auto_state_name[7] = {"IDLE",  "DROP",    "LAND",     "CALIBRATE",
+                                       "DRIVE", "ARRIVED", "TERMINATE"};
     enum AutoState
     {
+        /**
+         * @brief The default state. Should be the state to be in when flying and before dropping.
+         * Trigger to DROP by a external signal
+         */
         IDLE,
+
+        /**
+         * @brief The dropping state, should transit to LAND right away. However, if communication
+         * is established, then this is where it tells the winch that rover has not yet landed
+         */
         DROP,
+
+        /**
+         * @brief landing state, check if the rover is landed.
+         *
+         */
         LAND,
+        /**
+         * @brief Calibrate sensor state. Check the IMU, compass, GPS readings.
+         *
+         */
+        CALIBRATE,
+        /**
+         * @brief Go WALL-E GO
+         */
         DRIVE,
-        ARRIVED
+        /**
+         * @brief Mission complete
+         */
+        ARRIVED,
+        /**
+         * @brief NOOOOOOOOOOO:
+         * https://www.google.com/url?sa=i&url=https%3A%2F%2Fm.youtube.com%2Fwatch%3Fv%3DoDtzyq7-8sE&psig=AOvVaw3iKHOotLrjqT8utYnHuVjw&ust=1611022838706000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCOjtl_S1pO4CFQAAAAAdAAAAABAE
+         *
+         */
+        TERMINATE
     };
+    // TODO add Low power state
     class StateMachine
     {
        private:
+        // drivers
         sensor::gps::AdafruitUltimateGPS* rover_gps;
         sensor::compass::BNO055Compass* rover_compass;
         sensor::rc::PPMReceiver* ppm_rc;
@@ -47,16 +81,16 @@ namespace controller
         actuator::motor::DCMotor* right_motor;
         actuator::servo::Servo* drop_servo;
         sensor::barometer::BMP280Barometer* rover_barometer;
-
-        // objects that won't be shared
         display::OLED* rover_oled;
+
+        // controllers
         controller::RoverController* rover_controller;
         controller::LandingController* landing_controller;
         controller::Planning* planning;
         AutoState current_state;
         std::pair<double, double> motor_result;
 
-
+        // GPS realted data
         std::pair<double, double> current_coordinate;
         std::pair<double, double> last_coordinate;
         std::pair<double, double> target_coordinate;
@@ -78,13 +112,13 @@ namespace controller
         StateMachine();
         /**
          * @brief calibration procedure
-         *
+         * TODO: finish this module
          */
         void Calibration();
 
         /**
          * @brief
-         *
+         * TODO: finish this module
          */
         void CheckConnection();
 

@@ -1,9 +1,8 @@
 /**
  * @file rover_controller.h
- * @author your name (you@domain.com)
  * @brief Controller for the Rover, include rover's control mapping, estimation and
  * localization
- * @version 0.1
+ * @version 1.0
  * @date 2021-01-12
  *
  * @copyright Copyright (c) 2021
@@ -57,13 +56,22 @@ namespace controller
 
        public:
         imu::Vector<3> q;  //[x, y, theta], the state model of Rover
-        RoverController(int dt);
+        RoverController(int dt)
+            : dt(dt),
+              last_error(0),
+              error_sum(0),
+              KP(estimation::DEFAULT_KP),
+              KI(estimation::DEFAULT_KI),
+              KD(estimation::DEFAULT_KD),
+              q(imu::Vector<3>(0, 0, 0))
+        {
+        }
 
         /**
          * @brief Update the Rover state model q
          */
-        void RoverControllerUpdate(imu::Vector<3> linear_accel,
-                                   imu::Vector<3> orientation, imu::Vector<3> euler);
+        void RoverControllerUpdate(imu::Vector<3> linear_accel, imu::Vector<3> orientation,
+                                   imu::Vector<3> euler);
         /**
          * @brief Processes the passed speed and angle and returns the values passed to
          * the dc motors
@@ -93,8 +101,7 @@ namespace controller
          */
         std::pair<double, double> HeadingPIDController(std::pair<double, double> src,
                                                        std::pair<double, double> dest,
-                                                       double current_heading,
-                                                       double current_dist);
+                                                       double current_heading, double current_dist);
 
 
         void Debug();

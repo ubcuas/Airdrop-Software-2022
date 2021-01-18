@@ -1,3 +1,12 @@
+/**
+ * @file adafruit_ultimate_gps.h
+ * @brief
+ * @version 1.0
+ * @date 2021-01-17
+ *
+ * @copyright Copyright (c) 2021
+ *
+ */
 #pragma once
 
 #include <Adafruit_GPS.h>

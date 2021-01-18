@@ -1,8 +1,7 @@
 /**
  * @file landing_controller.h
- * @author your name (you@domain.com)
- * @brief
- * @version 0.1
+ * @brief Landing detection controller
+ * @version 1.0
  * @date 2021-01-12
  *
  * @copyright Copyright (c) 2021
@@ -27,10 +26,7 @@ namespace controller
        public:
         LandingController();
         /**
-         * @brief Landing detection algorithm. Takes input from
-         *
-         * @todo complete function signature.
-         *
+         * @brief Landing detection algorithm. Takes input from IMU to update
          */
         void LandingDetectionUpdate(imu::Vector<3> input);
 
@@ -43,10 +39,10 @@ namespace controller
         bool GetLandingStatus() const;
 
         void Debug() const;
-        
+
         /**
          * @brief Debug purpose only: test how long the timing is.
-         * 
+         *
          */
         void Start();
         void End();

@@ -9,7 +9,7 @@ namespace display
         display   = Adafruit_SSD1306(config::SCREEN_WIDTH, config::SCREEN_HEIGHT, &Wire,
                                    config::OLED_RESET);
         if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C))
-        {  // Address 0x3C for 128x32
+        {
             Serial.println(F("SSD1306 allocation failed"));
         }
         connected = true;

@@ -56,17 +56,16 @@ namespace sensor
             {
                 current_heading -= magic::COMPASS_OFFSET;
             }
-            current_heading = (current_heading > 180) ? (current_heading - 180)
-                                                      : (current_heading + 180);
+            current_heading =
+                (current_heading > 180) ? (current_heading - 180) : (current_heading + 180);
         }
 
         bool BNO055Compass::Calibrate()
         {
-            uint8_t system, gyro, accel, mg = 0;
+            uint8_t system, gyro, accel = 0;
             bno055.getCalibration(&system, &gyro, &accel, &compass_calibration);
 
-            if ((system == 0) || (gyro == 0) || (accel == 0) ||
-                (compass_calibration == 0))
+            if ((system == 0) || (gyro == 0) || (accel == 0) || (compass_calibration == 0))
             {
                 return false;
             }
@@ -79,11 +78,9 @@ namespace sensor
             Serial.printf("calibrate: %d\n", compass_calibration);
             Serial.printf("Current heading: %f\n", current_heading);
             imu::Vector<3> data = bno055.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
-            Serial.printf("linear accel: x: %f, y: %f, z: %f\n", data[0], data[1],
-                          data[2]);
+            Serial.printf("linear accel: x: %f, y: %f, z: %f\n", data[0], data[1], data[2]);
             data = bno055.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
-            Serial.printf("orientation: x: %f, y: %f, z: %f\n", data[0], data[1],
-                          data[2]);
+            Serial.printf("orientation: x: %f, y: %f, z: %f\n", data[0], data[1], data[2]);
             data = bno055.getVector(Adafruit_BNO055::VECTOR_EULER);
             Serial.printf("euler: x: %f, y: %f, z: %f\n", data[0], data[1], data[2]);
             Serial.println("=================");

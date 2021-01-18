@@ -1,7 +1,6 @@
 #include <actuator/dc_motor.h>
 #include <pin_assignment.h>
 
-
 namespace actuator
 {
     namespace motor
@@ -28,9 +27,8 @@ namespace actuator
 
         bool DCMotor::CheckConnection()
         {
-            // TODO: finish this
-            Serial.print(this->actuator_name);
-            Serial.println(" Checking Connection");
+            // More of a dummy function. Without encoder, there is no way to check if the connection
+            // is established
             return connected;
         }
 

@@ -1,4 +1,13 @@
-#pragma once
+
+/**
+ * @file servo.h
+ * @brief
+ * @version 1.0
+ * @date 2021-01-17
+ *
+ * @copyright Copyright (c) 2021
+ *
+ */
 #include <actuator/actuator.h>
 
 namespace actuator
@@ -26,7 +35,7 @@ namespace actuator
             virtual void Debug() override;
 
             virtual void ChangeInput(int input) override;
-            
+
             int GetCurrentAngle() const;
         };
     }  // namespace servo

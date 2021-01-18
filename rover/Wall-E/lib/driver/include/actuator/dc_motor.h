@@ -1,3 +1,12 @@
+/**
+ * @file dc_motor.h
+ * @brief
+ * @version 1.0
+ * @date 2021-01-17
+ *
+ * @copyright Copyright (c) 2021
+ *
+ */
 #pragma once
 #include <actuator/actuator.h>
 namespace actuator

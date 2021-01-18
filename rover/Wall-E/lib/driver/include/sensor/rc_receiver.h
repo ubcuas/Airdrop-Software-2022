@@ -1,3 +1,12 @@
+/**
+ * @file rc_receiver.h
+ * @brief
+ * @version 1.0
+ * @date 2021-01-17
+ *
+ * @copyright Copyright (c) 2021
+ *
+ */
 #pragma once
 
 #include <sensor/sensor.h>
@@ -20,7 +29,7 @@ namespace sensor
             int yaw_channel_value;
             int switch_channel_value;
 
-            // constants after calibrating the RC input. 
+            // constants after calibrating the RC input.
             int calibrate_throttle_max;
             int calibrate_throttle_min;
             int calibrate_yaw_max;

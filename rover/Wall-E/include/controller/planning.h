@@ -1,3 +1,12 @@
+/**
+ * @file planning.h
+ * @brief
+ * @version 1.0
+ * @date 2021-01-17
+ *
+ * @copyright Copyright (c) 2021
+ *
+ */
 #pragma once
 #include <constants.h>
 #include <sensor/gps_coordinate.h>
@@ -5,6 +14,10 @@
 #include <queue>
 namespace controller
 {
+    /**
+     * @brief All GPS planning related code
+     *
+     */
     class Planning
     {
        private:
@@ -37,7 +50,13 @@ namespace controller
          */
         std::pair<double, double> UpdateWaypoint(std::pair<double, double> src);
 
+        /**
+         * @brief Get the Next Way Point
+         *
+         * @return std::pair<double, double>  the next way point
+         */
         std::pair<double, double> GetNextWayPoint();
+
         /**
          * Determines if the rover is close enough to the target location
          * @param src the current rover coordinate
@@ -47,9 +66,7 @@ namespace controller
          * @returns true if the distance between the coordinates is less than the
          * distance_threshold
          */
-        static bool ReachedWaypoint(std::pair<double, double> src,
-                                    std::pair<double, double> dest,
+        static bool ReachedWaypoint(std::pair<double, double> src, std::pair<double, double> dest,
                                     double distance_threshold);
-
     };
 }  // namespace controller
