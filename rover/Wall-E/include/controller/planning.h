@@ -57,12 +57,6 @@ namespace controller
          */
         bool CheckStability(std::pair<double, double> src);
 
-        /**
-         * Determines if past data points are within boundaries,
-         * excluding outliers from before CheckStability returns true
-         */
-        bool CheckWithinBoundaries();
-
         std::pair<double, double> AverageDeviation();
     };
 }  // namespace controller

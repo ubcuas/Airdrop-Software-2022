@@ -147,9 +147,4 @@ namespace controller
 
         return std::make_pair(averageDeviationLatitude,averageDeviationLongitude);
     }
-
-    bool Planning::CheckWithinBoundaries() {
-       
-    }
-
 }  // namespace controller
