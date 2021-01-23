@@ -68,6 +68,9 @@ namespace magic
     const static int MAX_MOTOR_INPUT       = 255;
     const static int MIN_MOTOR_INPUT       = 40;
     const static int PERCENTAGE            = 100;
+    const static double MAX_DEVIATION      = 3;
+    const static double GPS_ERROR_RADIUS   = 3;
+    const static int NUM_DATA_POINTS       = 10;
 }  // namespace magic
 
 namespace config

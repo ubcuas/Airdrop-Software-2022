@@ -49,5 +49,20 @@ namespace controller
         static bool ReachedWaypoint(std::pair<double, double> src,
                                     std::pair<double, double> dest,
                                     double distance_threshold);
+
+        /**
+         * Determines if the gps reading is stable
+         * Called when drive state is first initiated
+         * @param src current location coordinates
+         */
+        bool CheckStability(std::pair<double, double> src);
+
+        /**
+         * Determines if past data points are within boundaries,
+         * excluding outliers from before CheckStability returns true
+         */
+        bool CheckWithinBoundaries();
+
+        std::pair<double, double> AverageDeviation();
     };
 }  // namespace controller
