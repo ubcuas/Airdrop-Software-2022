@@ -2,24 +2,34 @@
 #include <Servo.h>
 
 #define REEL_MOTOR_PIN 5
+#define MOTOR_STOP 1000
+#define MOTOR_MAX 2000
 
-Servo reelMotor;
-int speed = 0;
+#define BRAKE_SERVO_PIN 7
+#define ACTUATOR_MAX 1000
+#define ACTUATOR_MIN 2000
+
+Servo motor;
+Servo brake_servo;
 
 void setup() {
-  reelMotor.attach(REEL_MOTOR_PIN); 
+  motor.attach(REEL_MOTOR_PIN);
+  motor.writeMicroseconds(MOTOR_STOP);
+  delay(1000);
+  motor.writeMicroseconds(MOTOR_MAX);
+  delay(1000);
 
-  Serial.begin(9600);
-  while (! Serial);  // waits for active connection between serial and PC
-  Serial.println("Speed 0 to 180");
+  brake_servo.attach(BRAKE_SERVO_PIN);
 }
 
 void loop() {
-  if (Serial.available()) {
-    speed = Serial.println();
-  }
-  if (speed >= 0  &&  speed <= 180) {
-    reelMotor.write(speed);
-  }
-}
+  motor.writeMicroseconds(MOTOR_STOP);
+  delay(1000);
+  motor.writeMicroseconds(MOTOR_MAX);
+  delay(1000);
 
+  brake_servo.writeMicroseconds(ACTUATOR_MAX);
+  delay(1000);
+  brake_servo.writeMicroseconds(ACTUATOR_MIN);
+  delay(1000);
+}
