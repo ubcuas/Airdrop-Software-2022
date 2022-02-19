@@ -9,7 +9,7 @@
 double calcTargetSpeed(double total_dist, double dist_reeled) {
   double 
     decelerate_dist = 5.0, // Decelerates to a stop in this many meters
-    max_speed = 2.0, // (m/s)
+    max_speed = 0.5, // (m/s)
     target_speed;
     
   if (dist_reeled < (total_dist - decelerate_dist)) {

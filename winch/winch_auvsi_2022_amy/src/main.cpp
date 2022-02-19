@@ -9,7 +9,7 @@
 #define SERVO_MAX 2000
 #define SERVO_MIN 1000
 
-int mode = 2; // Mode: 1 for hold, 2 for reel down, 3 for reel up
+int mode = 1; // Mode: 1 for hold, 2 for reel down, 3 for reel up
 
 // Winch operation
 double
@@ -21,8 +21,8 @@ long start_time, current_time; // for timing, after the winch reaches the bottom
 // PID variables
 double 
   input, output, setpoint,
-  Kp = 2, 
-  Ki = 5, 
+  Kp = 100, 
+  Ki = 0, 
   Kd = 0;
 
 PID speed_control(&input, &output, &setpoint, Kp, Ki, Kd, DIRECT);
@@ -45,6 +45,7 @@ void setup() {
 
   // Turn PID on
   speed_control.SetMode(AUTOMATIC);
+  speed_control.SetOutputLimits(0,500);
 
   /*speed_controller.setConstants(1.0, 0.0, 0.0);
   speed_controller.begin(1000, 15000, 5, &speed_PID_vals);*/
@@ -82,6 +83,8 @@ void loop() {
     calcEncData(&enc_drum);
     setpoint = calcTargetSpeed(total_dist, enc_drum.position_m);
     input = enc_drum.speed_mps;
+    Serial.println(setpoint);
+    Serial.println(input);
 
     speed_control.Compute(); // Compute PID
     Serial.println(output);
@@ -123,6 +126,6 @@ void loop() {
   Serial.println(-1 * speed_PID_vals.return_val * 1000 / u_bound + 1000);
   brake_servo.writeMicroseconds(-1 * speed_PID_vals.return_val * 1000 / u_bound + 1000);*/
   
-  delay(50);
+  delay(1000); //50
   
 }
