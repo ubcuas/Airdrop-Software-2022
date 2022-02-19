@@ -21,7 +21,7 @@ long start_time, current_time; // for timing, after the winch reaches the bottom
 // PID variables
 double 
   input, output, setpoint,
-  Kp = 100, 
+  Kp = 1000, 
   Ki = 0, 
   Kd = 0;
 
@@ -70,6 +70,8 @@ void setup() {
 }
 
 void loop() {
+  Serial.println(mode);
+
   if (mode == 1) { // Hold
     reel_motor.writeMicroseconds(SERVO_MIN); // Reel motor off
     brake_servo.writeMicroseconds(SERVO_MIN); // Max braking
@@ -84,7 +86,7 @@ void loop() {
     setpoint = calcTargetSpeed(total_dist, enc_drum.position_m);
     input = enc_drum.speed_mps;
     Serial.println(setpoint);
-    Serial.println(input);
+    //Serial.println(input);
 
     speed_control.Compute(); // Compute PID
     Serial.println(output);
@@ -96,7 +98,7 @@ void loop() {
     else if (brake_servo_pos < SERVO_MIN)
       brake_servo_pos = SERVO_MIN;
     // Write to servo
-    //brake_servo.writeMicroseconds(brake_servo_pos);
+    brake_servo.writeMicroseconds(brake_servo_pos);
 
     if (abs(setpoint - 0.0) > 0.1) // 0.1 m/s error margin
       start_time = millis();
@@ -111,7 +113,11 @@ void loop() {
   else if (mode == 3) { // reel up
     brake_servo.writeMicroseconds(SERVO_MAX); // Release brake
     while (enc_drum.position_m > 0.1) { // 0.1 m error margin
-      reel_motor.writeMicroseconds(SERVO_MAX); // Reel up as fast as possible
+      reel_motor.writeMicroseconds(1200); // Reel up as fast as possible
+      
+      // For testing: emergency stop switch
+      if (digitalRead(LIMIT_SWITCH_PIN) == HIGH)
+        mode = 1;
     }
     mode = 1;
   }
@@ -126,6 +132,6 @@ void loop() {
   Serial.println(-1 * speed_PID_vals.return_val * 1000 / u_bound + 1000);
   brake_servo.writeMicroseconds(-1 * speed_PID_vals.return_val * 1000 / u_bound + 1000);*/
   
-  delay(1000); //50
+  delay(50);
   
 }
