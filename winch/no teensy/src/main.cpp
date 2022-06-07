@@ -4,22 +4,25 @@
 #include "Pin_Assignments.h"
 #include "Magnetic_Encoder.h"
 #include "Operation.h"
+#include "Communication.h"
 
 #define SERVO_MAX 2000
 #define SERVO_MIN 1000
 
-int mode = 1; // Mode: 1 for hold, 2 for reel down, 3 for reel up
+int 
+  mode = 1, // Mode: 1 for hold, 2 for reel down, 3 for reel up
+  action = 0; // Signal to change mode
 
 // Winch operation
-double total_dist = 1 * 7.4; // Total distance that the winch must reel down (m) **********************
+double total_dist = 1 * 7.4; // Total distance that the winch must reel down (m) *******************
 int brake_servo_pos;
 long start_time, current_time; // For timing, after the winch reaches the bottom
 
-// PID variables
+// PID variables ********************
 double 
   input, output, setpoint,
-  Kp = 80, 
-  Ki = 700, 
+  Kp = 80,
+  Ki = 700,
   Kd = 0;
 
 PID speed_control(&input, &output, &setpoint, Kp, Ki, Kd, DIRECT);
@@ -34,7 +37,7 @@ void setup() {
   speed_control.SetMode(AUTOMATIC);
   speed_control.SetOutputLimits(0,1000);
   
-  enc_drum.drum_radius_m = 17.5/2 *0.001;
+  enc_drum.drum_radius_m = 18/2 *0.001;
   enc_drum.states_per_turn = 4096;
 
   encoderSetup(&enc_drum);
@@ -53,9 +56,10 @@ void setup() {
 }
 
 void loop() {
-  //Serial.println(mode);
+  Serial.println(mode);
   //Serial.println(enc_drum.position_m);
-  //Serial.println(digitalRead(LIMIT_SWITCH_PIN));
+
+  action = readSerial(mode); // Read Serial input
 
   if (mode == 1) { // Hold
     reel_motor.writeMicroseconds(SERVO_MIN); // Reel motor off
@@ -63,8 +67,9 @@ void loop() {
 
     enc_drum.position_m = 0;
 
-    // For testing; in actual operation, we will be receiving a signal from aircraft to start reeling down
-    if (digitalRead(LIMIT_SWITCH_PIN) == LOW) {
+    // Switch input (for testing) or signal from odroid
+    if (digitalRead(LIMIT_SWITCH_PIN) == LOW  ||  action == 1) {
+      action = 0;
       mode = 2;
       delay(1000);
     }
@@ -74,15 +79,11 @@ void loop() {
     calcEncData(&enc_drum);
     setpoint = calcTargetSpeed(total_dist, enc_drum.position_m);
     input = enc_drum.speed_mps;
-    //Serial.print("Target speed: ");
     //Serial.println(setpoint);
     //Serial.println(input);
-    //Serial.print("        ");
     //Serial.println(enc_drum.speed_mps);
 
     speed_control.Compute(); // Compute PID
-    //Serial.print("Output to servo: ");
-    //Serial.println(1500 - output);
     Serial.println(output);
     
     // Constrain output to range of servo
@@ -95,44 +96,43 @@ void loop() {
     brake_servo.writeMicroseconds(brake_servo_pos);
     //Serial.println(brake_servo_pos);
 
-    // When reaches bottom with 0.2 m error margin, start timer to wait for rover release ***********************
-    if (total_dist - enc_drum.position_m > 1) { // Not at bottom yet
+    // When reaches bottom with 2 m error margin, start timer to wait for rover release ******************
+    if (total_dist - enc_drum.position_m > 2) { // Not near bottom yet
       start_time = millis();
     }
     else {
-      current_time = millis(); // Start timer
+      current_time = millis(); // Near bottom, start timer
     }
 
-    if (current_time - start_time > 20 * 1000) { // After 10 seconds have elapsed *********************** 
+    // After 20 seconds have elapsed or switch pressed (for testing) or signal from odroid *******************
+    if (current_time - start_time > (long)1000L * 20  ||  digitalRead(LIMIT_SWITCH_PIN) == LOW  ||  action == 1) {
+      action = 0;
       mode = 3;
       brake_servo.writeMicroseconds(SERVO_MIN); // Release brake
-      delay(2000);
-      start_time = current_time = millis(); // Reset timer
-    }
-
-    // For testing: if pressed, reel back up
-    if (digitalRead(LIMIT_SWITCH_PIN) == LOW) {
-      mode = 3;
-      brake_servo.writeMicroseconds(SERVO_MIN); // Release brake
-      delay(2000);
+      delay(1500);
       start_time = current_time = millis(); // Reset timer
     }
   }
 
   else if (mode == 3) { // Reel up
     calcEncData(&enc_drum);
+    current_time = millis(); // Timer
     brake_servo.writeMicroseconds(SERVO_MIN); // Release brake
 
-    if (enc_drum.position_m > 0) { // 0.1 m error margin
+    if (enc_drum.position_m > 0) { // 0 m error margin
       reel_motor.writeMicroseconds(1300); // Reel up
     }
     else {
       mode = 1;
+      start_time = current_time = millis(); // Reset timer
+      Serial.println("AIRDROPCOMPLETE"); // To odroid
     }
 
-    // For testing: emergency stop switch
-    if (digitalRead(LIMIT_SWITCH_PIN) == LOW) {
+    // Switch pressed or exceed time limit of 1 minute ********************
+    if (digitalRead(LIMIT_SWITCH_PIN) == LOW  ||  (current_time - start_time) > ((long)1000L * 60)) {
       mode = 1;
+      start_time = current_time = millis(); // Reset timer
+      Serial.println("AIRDROPCOMPLETE"); // To odroid
       delay(1000);
     }
   }
