@@ -13,4 +13,7 @@
 // Switch (for testing)
 #define LIMIT_SWITCH_PIN 8
 
+// Onboard LED
+#define LED_PIN 13
+
 #endif

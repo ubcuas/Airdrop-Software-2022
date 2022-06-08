@@ -8,15 +8,16 @@
  */
 double calcTargetSpeed(double total_dist, double dist_reeled) {
   double 
-    decelerate_dist = 5.0, // Decelerates to a stop in this many meters *******************
-    max_speed = 1, // (m/s) *******************
-    target_speed;
+    decelerate_dist = total_dist * 0.25, // Decelerates to a stop in this many meters *******************
+    max_speed = 0.2, // (m/s) *******************
+    target_speed,
+    extra = 0.4; // (m/s) ***************
     
   if (dist_reeled < (total_dist - decelerate_dist)) {
-    target_speed = max_speed;
+    target_speed = max_speed + extra;
   }
   else {
-    target_speed = max_speed * (total_dist - dist_reeled) / decelerate_dist + 0.05 ; // Linearly decrease to 0.05 *****************
+    target_speed = max_speed * (total_dist - dist_reeled) / decelerate_dist + extra ; // Linearly decrease to 0.05 *****************
   }
 
   return target_speed;

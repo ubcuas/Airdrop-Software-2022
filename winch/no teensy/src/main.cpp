@@ -14,16 +14,16 @@ int
   action = 0; // Signal to change mode
 
 // Winch operation
-double total_dist = 1 * 7.4; // Total distance that the winch must reel down (m) *******************
+double total_dist = 2.5; // Total distance that the winch must reel down (m) *******************
 int brake_servo_pos;
 long start_time, current_time; // For timing, after the winch reaches the bottom
 
 // PID variables ********************
 double 
   input, output, setpoint,
-  Kp = 80,
+  Kp = 50, //80
   Ki = 700,
-  Kd = 0;
+  Kd = 20; //10
 
 PID speed_control(&input, &output, &setpoint, Kp, Ki, Kd, DIRECT);
 struct encoder_data enc_drum;
@@ -52,6 +52,9 @@ void setup() {
 
   // Limit switch for testing
   pinMode(LIMIT_SWITCH_PIN, INPUT_PULLUP);
+
+  // LED for signal
+  pinMode(LED_PIN, OUTPUT);
 
 }
 
@@ -97,11 +100,12 @@ void loop() {
     //Serial.println(brake_servo_pos);
 
     // When reaches bottom with 2 m error margin, start timer to wait for rover release ******************
-    if (total_dist - enc_drum.position_m > 2) { // Not near bottom yet
+    if (total_dist - enc_drum.position_m > total_dist * 0.2) { // Not near bottom yet
       start_time = millis();
     }
     else {
       current_time = millis(); // Near bottom, start timer
+      digitalWrite(LED_PIN, HIGH); // Turn on LED to signal timer start
     }
 
     // After 20 seconds have elapsed or switch pressed (for testing) or signal from odroid *******************
@@ -109,6 +113,7 @@ void loop() {
       action = 0;
       mode = 3;
       brake_servo.writeMicroseconds(SERVO_MIN); // Release brake
+      digitalWrite(LED_PIN, LOW); // Turn off LED
       delay(1500);
       start_time = current_time = millis(); // Reset timer
     }
