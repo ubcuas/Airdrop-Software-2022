@@ -14,7 +14,7 @@ int
   action = 0; // Signal to change mode
 
 // Winch operation
-double total_dist = 2.5; // Total distance that the winch must reel down (m) *******************
+double total_dist = 22.86; // Total distance that the winch must reel down 22.86 (m) *******************
 int brake_servo_pos;
 long start_time, current_time; // For timing, after the winch reaches the bottom
 
@@ -65,16 +65,16 @@ void loop() {
   action = readSerial(mode); // Read Serial input
 
   if (mode == 1) { // Hold
-    reel_motor.writeMicroseconds(SERVO_MIN); // Reel motor off
+    reel_motor.writeMicroseconds(SERVO_MIN);  // Reel motor off
     brake_servo.writeMicroseconds(SERVO_MAX); // Max braking
 
     enc_drum.position_m = 0;
 
     // Switch input (for testing) or signal from odroid
     if (digitalRead(LIMIT_SWITCH_PIN) == LOW  ||  action == 1) {
-      action = 0;
-      mode = 2;
-      delay(1000);
+      action = 0;   // Reset
+      mode = 2;     // Change mode
+      delay(1000);  // Wait so that button doesn't read twice
     }
   }
 
@@ -99,46 +99,51 @@ void loop() {
     brake_servo.writeMicroseconds(brake_servo_pos);
     //Serial.println(brake_servo_pos);
 
-    // When reaches bottom with 2 m error margin, start timer to wait for rover release ******************
+    // When reaches bottom with 20% error margin, start timer to wait for rover release ******************
     if (total_dist - enc_drum.position_m > total_dist * 0.2) { // Not near bottom yet
       start_time = millis();
     }
     else {
-      current_time = millis(); // Near bottom, start timer
-      digitalWrite(LED_PIN, HIGH); // Turn on LED to signal timer start
+      current_time = millis();      // Near bottom, start timer
+      digitalWrite(LED_PIN, HIGH);  // Turn on LED to signal timer start
     }
 
     // After 20 seconds have elapsed or switch pressed (for testing) or signal from odroid *******************
     if (current_time - start_time > (long)1000L * 20  ||  digitalRead(LIMIT_SWITCH_PIN) == LOW  ||  action == 1) {
-      action = 0;
-      mode = 3;
-      brake_servo.writeMicroseconds(SERVO_MIN); // Release brake
-      digitalWrite(LED_PIN, LOW); // Turn off LED
-      delay(1500);
-      start_time = current_time = millis(); // Reset timer
+      action = 0;                                   // Reset
+      mode = 3;                                     // Change mode
+      brake_servo.writeMicroseconds(SERVO_MIN);     // Release brake
+      digitalWrite(LED_PIN, LOW);                   // Turn off LED
+      delay(1500);                                  // Wait for servo
+      start_time = current_time = millis();         // Reset timer
     }
   }
 
   else if (mode == 3) { // Reel up
     calcEncData(&enc_drum);
     current_time = millis(); // Timer
-    brake_servo.writeMicroseconds(SERVO_MIN); // Release brake
+    brake_servo.writeMicroseconds(SERVO_MIN); // Keep brake released
 
-    if (enc_drum.position_m > 0) { // 0 m error margin
-      reel_motor.writeMicroseconds(1300); // Reel up
+    // If speed is pretty much zero (because it has reeled all the way back in and is stuck), stop reeling
+    // Also add a 'more than 2 seconds have elapsed' requirement, since startup might be slow
+    // Or if the encoder says we have reeled all the way back in
+    if ( (enc_drum.speed_mps < 0.2  &&  (current_time - start_time) > (long)1000L * 2)  ||  (enc_drum.position_m <= 0) ) {
+      //reel_motor.writeMicroseconds(SERVO_MIN);  // Reel motor off
+      mode = 1;
+      start_time = current_time = millis(); // Reset timer
+      Serial.println("AIRDROPCOMPLETE");    // To odroid
     }
+    // Otherwise, keep reeling up
     else {
-      mode = 1;
-      start_time = current_time = millis(); // Reset timer
-      Serial.println("AIRDROPCOMPLETE"); // To odroid
+      reel_motor.writeMicroseconds(1300);
     }
 
-    // Switch pressed or exceed time limit of 1 minute ********************
-    if (digitalRead(LIMIT_SWITCH_PIN) == LOW  ||  (current_time - start_time) > ((long)1000L * 60)) {
+    // Switch pressed
+    if (digitalRead(LIMIT_SWITCH_PIN) == LOW) {
       mode = 1;
       start_time = current_time = millis(); // Reset timer
-      Serial.println("AIRDROPCOMPLETE"); // To odroid
-      delay(1000);
+      Serial.println("AIRDROPCOMPLETE");    // To odroid
+      delay(1000);                          // Wait so that switch doesn't read twice
     }
   }
   
