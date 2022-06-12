@@ -17,7 +17,7 @@ int
 
 // Winch operation
 double 
-  total_dist = 7.5, // Total distance that the winch must reel down (m); 22.86 m; NOTE: keep this greater than 2 m *******************
+  total_dist = 22.86, // Total distance that the winch must reel down (m); 22.86 m; NOTE: keep this greater than 2 m *******************
   reeling_error = 2.0; // Difference in string length when reeling up and down due to the string wrapping differently around drum
 int brake_servo_pos;
 long start_time, current_time; // For timing, after the winch reaches the bottom
@@ -36,7 +36,6 @@ Servo reel_motor;
 
 void setup() {
   Serial.begin(9600);
-  //Serial.println("System begin");
 
   // Turn PID on
   speed_control.SetMode(AUTOMATIC);
@@ -65,7 +64,7 @@ void setup() {
 
 void loop() {
   //Serial.println(mode);
-  Serial.println(enc_drum.position_m);
+  //Serial.println(enc_drum.position_m);
 
   action = readSerial(mode); // Read Serial input
 
