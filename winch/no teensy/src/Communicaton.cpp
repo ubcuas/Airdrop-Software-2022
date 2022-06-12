@@ -4,15 +4,15 @@
 /*
  * Purpose: Communication with odroid on aircraft
  * Input: Current winch mode
- * Output: 0 (do nothing) or 1 (do something)
+ * Output: 0 (do nothing) or 1 (reel down) or 2 (emergency)
  */
 int readSerial(int mode) {
     String input = "";
     int output = 0;
 
     // Read input
-    if (Serial.available() > 1) {
-        input = Serial.readStringUntil('\n');
+    if (Serial.available() > 0) {
+        input = Serial.readStringUntil('1');
     }
 
     // Confirm connection with odroid
@@ -25,9 +25,9 @@ int readSerial(int mode) {
         output = 1;
     }
 
-    // Signal for emergency cancel while reeling down
+    // Signal for emergency cancel while reeling down (NOT USING)
     if (mode == 2  &&  input == "AIRDROPCANCEL") {
-        output = 1;
+        output = 2;
     }
 
     return output;

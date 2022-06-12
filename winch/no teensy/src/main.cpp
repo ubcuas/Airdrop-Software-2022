@@ -9,21 +9,25 @@
 #define SERVO_MAX 2000
 #define SERVO_MIN 1000
 
+void(* resetFunc) (void) = 0;  // declare reset fuction at address 0
+
 int 
   mode = 1, // Mode: 1 for hold, 2 for reel down, 3 for reel up
   action = 0; // Signal to change mode
 
 // Winch operation
-double total_dist = 22.86; // Total distance that the winch must reel down 22.86 (m) *******************
+double 
+  total_dist = 7.5, // Total distance that the winch must reel down (m); 22.86 m; NOTE: keep this greater than 2 m *******************
+  reeling_error = 2.0; // Difference in string length when reeling up and down due to the string wrapping differently around drum
 int brake_servo_pos;
 long start_time, current_time; // For timing, after the winch reaches the bottom
 
 // PID variables ********************
 double 
   input, output, setpoint,
-  Kp = 50, //80
-  Ki = 700,
-  Kd = 20; //10
+  Kp = 25, //50
+  Ki = 25, //75
+  Kd = 0; //50
 
 PID speed_control(&input, &output, &setpoint, Kp, Ki, Kd, DIRECT);
 struct encoder_data enc_drum;
@@ -32,6 +36,7 @@ Servo reel_motor;
 
 void setup() {
   Serial.begin(9600);
+  //Serial.println("System begin");
 
   // Turn PID on
   speed_control.SetMode(AUTOMATIC);
@@ -59,8 +64,8 @@ void setup() {
 }
 
 void loop() {
-  Serial.println(mode);
-  //Serial.println(enc_drum.position_m);
+  //Serial.println(mode);
+  Serial.println(enc_drum.position_m);
 
   action = readSerial(mode); // Read Serial input
 
@@ -87,16 +92,21 @@ void loop() {
     //Serial.println(enc_drum.speed_mps);
 
     speed_control.Compute(); // Compute PID
-    Serial.println(output);
+    
     
     // Constrain output to range of servo
-    brake_servo_pos = 2000 - output;
+    brake_servo_pos = map(output,-500, 255, 2000, 1000);
+    //brake_servo_pos = 2000 - output;
     if (brake_servo_pos > SERVO_MAX)
       brake_servo_pos = SERVO_MAX;
     else if (brake_servo_pos < SERVO_MIN)
       brake_servo_pos = SERVO_MIN;
     // Write to servo
     brake_servo.writeMicroseconds(brake_servo_pos);
+    //Serial.println(brake_servo_pos);
+    //Serial.print("Out: ");
+    //Serial.println(output);
+    //Serial.print("Brake: ");
     //Serial.println(brake_servo_pos);
 
     // When reaches bottom with 20% error margin, start timer to wait for rover release ******************
@@ -108,8 +118,8 @@ void loop() {
       digitalWrite(LED_PIN, HIGH);  // Turn on LED to signal timer start
     }
 
-    // After 20 seconds have elapsed or switch pressed (for testing) or signal from odroid *******************
-    if (current_time - start_time > (long)1000L * 20  ||  digitalRead(LIMIT_SWITCH_PIN) == LOW  ||  action == 1) {
+    // After 20 seconds have elapsed OR switch pressed (for testing) OR signal from odroid (NOT USED) *******************
+    if (current_time - start_time > (long)1000L * 20  ||  digitalRead(LIMIT_SWITCH_PIN) == LOW  ||  action == 2) {
       action = 0;                                   // Reset
       mode = 3;                                     // Change mode
       brake_servo.writeMicroseconds(SERVO_MIN);     // Release brake
@@ -123,30 +133,43 @@ void loop() {
     calcEncData(&enc_drum);
     current_time = millis(); // Timer
     brake_servo.writeMicroseconds(SERVO_MIN); // Keep brake released
+    //Serial.println(current_time - start_time);
+    //Serial.println(enc_drum.speed_mps);
 
-    // If speed is pretty much zero (because it has reeled all the way back in and is stuck), stop reeling
-    // Also add a 'more than 2 seconds have elapsed' requirement, since startup might be slow
-    // Or if the encoder says we have reeled all the way back in
-    if ( (enc_drum.speed_mps < 0.2  &&  (current_time - start_time) > (long)1000L * 2)  ||  (enc_drum.position_m <= 0) ) {
-      //reel_motor.writeMicroseconds(SERVO_MIN);  // Reel motor off
+    // Rover is stuck on the hook, go back to mode 2 (reel down)
+    // This is detected if the motor is stalling (it can't carry weight of rover) and it is not the hook is not 
+    // getting stuck because of reeling error and 2 seconds have elapsed to allow the motor to start up
+    if ((abs(enc_drum.speed_mps) < 0.01)  &&  (enc_drum.position_m > reeling_error) &&  ((current_time - start_time) > (long)1000L * 2)) {
+      reel_motor.writeMicroseconds(SERVO_MIN);  // Reel motor off
+      mode = 2;                                 // Try reeling down again
+      start_time = current_time = millis();     // Reset timer
+      Serial.println("AIRDROPERROR");           // To odroid
+    }
+    // Stop reeling...
+    // ... If speed is pretty much zero, because it has reeled all the way back in and the hook is stuck; we know 
+    // this because it is within the reeling error and 2 seconds have elapsed to allow the motor to start up
+    // ... Or if the encoder says we have reeled all the way back in
+    else if ( ((abs(enc_drum.speed_mps) < 0.01)  &&  ((current_time - start_time) > (long)1000L * 2))  ||  (enc_drum.position_m <= 0) ) {
       mode = 1;
+      resetFunc(); //call reset
       start_time = current_time = millis(); // Reset timer
       Serial.println("AIRDROPCOMPLETE");    // To odroid
     }
     // Otherwise, keep reeling up
     else {
-      reel_motor.writeMicroseconds(1300);
+      reel_motor.writeMicroseconds(1200);
     }
 
     // Switch pressed
     if (digitalRead(LIMIT_SWITCH_PIN) == LOW) {
       mode = 1;
+      resetFunc(); //call reset
       start_time = current_time = millis(); // Reset timer
       Serial.println("AIRDROPCOMPLETE");    // To odroid
       delay(1000);                          // Wait so that switch doesn't read twice
     }
   }
   
-  delay(1);
+  //delay(1);
   
 }
